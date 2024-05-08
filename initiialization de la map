@@ -1,0 +1,9 @@
+void initializeBoard(int size) {
+    srand(time(NULL));
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
+            board[i][j].fish = rand() % 3 + 1;
+            board[i][j].player = -1;
+        }
+    }
+}
