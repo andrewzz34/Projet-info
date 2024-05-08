@@ -1,0 +1,40 @@
+#include <stdio.h>
+// background hexagonal pour projet
+#define SIZE 9  // Defines the size of the board
+
+void printBoard() {
+    for (int i = 0; i < SIZE; i++) {
+        // Print leading spaces to create a staggered effect for each row
+        for (int k = 0; k < i; k++) {
+            printf("   ");
+        }
+        // Print the top of the hexagons
+        for (int j = 0; j < SIZE; j++) {
+            printf(" __   ");
+        }
+        printf("\n");
+
+        // Print the upper part of the hexagons
+        for (int k = 0; k <= i; k++) {
+            printf("  ");
+        }
+        for (int j = 0; j < SIZE; j++) {
+            printf("/  \\__");
+        }
+        printf("\n");
+
+        // Print the lower part of the hexagons
+        for (int k = 0; k <= i; k++) {
+            printf("  ");
+        }
+        for (int j = 0; j < SIZE; j++) {
+            printf("\\__/  ");
+        }
+        printf("\n");
+    }
+}
+
+int main() {
+    printBoard();
+    return 0;
+}
