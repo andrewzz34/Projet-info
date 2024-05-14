@@ -6,20 +6,17 @@
 #define MAX_PLAYERS 6
 #define MIN_SIZE 9
 
-// Structure to represent each hexagonal tile on the board
 typedef struct {
-    int fish;  // Number of fish on the tile (1-3)
-    int player;  // Player ID of the penguin on the tile, -1 if none
+    int fish;  
+    int player;  
 } Tile;
 
-// Structure to represent each player
 typedef struct {
     char name[50];
     int score;
-    int penguins;  // Number of penguins the player has
+    int penguins; 
 } Player;
 
-// Game board and player array
 Tile board[MIN_SIZE][MIN_SIZE];
 Player players[MAX_PLAYERS];
 int numberOfPlayers;
