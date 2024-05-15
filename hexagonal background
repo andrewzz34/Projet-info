@@ -60,6 +60,7 @@ void printGameBoard(int rows, int cols, char *player_names[], int num_players) {
 
 }
 int main() {
+    system("clear"); 
     int num_players;
     char *player_names[6];
     int rows, cols;
@@ -97,12 +98,18 @@ int main() {
     // Affichage de la zone de jeu
     printGameBoard(rows, cols, player_names, num_players);
     
-    printf("\x1B[20;20H🐧\n");
-    printf("\x1B[60;20H\n");
+    printf("\x1B[23;22H🐧\n");
+    printf("\x1B[10;0H           \n");
+    printf("\x1B[11;0H         \n");
+    printf("\x1B[12;0H          \n");
+    printf("\x1B[13;0H    \n");
+    printf("\x1B[14;0H  \n");
+    
+    printf("\x1B[40;20H\n");
     // Libération de la mémoire allouée pour les noms des joueurs
     for (int i = 0; i < num_players; i++) {
         free(player_names[i]);
     }
-
+    
     return 0;
 }
