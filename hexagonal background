@@ -96,7 +96,9 @@ int main() {
 
     // Affichage de la zone de jeu
     printGameBoard(rows, cols, player_names, num_players);
-
+    
+    printf("\x1B[20;20H🐧\n");
+    printf("\x1B[60;20H\n");
     // Libération de la mémoire allouée pour les noms des joueurs
     for (int i = 0; i < num_players; i++) {
         free(player_names[i]);
