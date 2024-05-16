@@ -1,56 +1,69 @@
 //     Mon code :
 
 
-void setupPlayers() {
-    printf("Enter the number of players (2 to 6): ");
-    scanf("%d", &numberOfPlayers);
-    while (numberOfPlayers < 2 || numberOfPlayers > 6) {
-        printf("Invalid number of players, please enter a number between 2 and 6: ");
-        scanf("%d", &numberOfPlayers);
-    }
-    for (int i = 0; i < numberOfPlayers; i++) {
-        printf("Enter name for player %d: ", i + 1);
-        scanf("%s", players[i].name);
-        players[i].score = 0;
-        // Set number of penguins based on the number of players
-        if (numberOfPlayers == 2) players[i].penguins = 4;
-        else if (numberOfPlayers == 3) players[i].penguins = 3;
-        else players[i].penguins = 2;
-    }
-}
-
-
-
-//      version plus securisé avec l'aide de youtube et internet :
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX_PLAYERS 6
+#define MAX_NAME_LENGTH 49
+#define PLAYER_NAME_BUFFER 50 
+
+typedef struct {
+    int fish;  
+    int player;  
+} Tile;
+
+typedef struct {
+    char player_name[PLAYER_NAME_BUFFER];
+    int score;
+    int penguins; 
+} Player;
+
+Player players[MAX_PLAYERS];
+
 void setupPlayers() {
-    char input[100];  // Buffer for reading input
+    int numberOfPlayers;
 
     printf("Enter the number of players (2 to 6): ");
-    fgets(input, sizeof(input), stdin);  // Read the line as string
-    numberOfPlayers = atoi(input);  // Convert string to integer
+    scanf("%d", &numberOfPlayers);
+    while (getchar() != '\n');
 
     while (numberOfPlayers < 2 || numberOfPlayers > 6) {
         printf("Invalid number of players, please enter a number between 2 and 6: ");
-        fgets(input, sizeof(input), stdin);
-        numberOfPlayers = atoi(input);
+        scanf("%d", &numberOfPlayers);
+        while (getchar() != '\n');  
     }
 
     for (int i = 0; i < numberOfPlayers; i++) {
-        printf("Enter name for player %d: ", i + 1);
-        fgets(players[i].name, sizeof(players[i].name), stdin);
-        // Remove newline character if present
-        players[i].name[strcspn(players[i].name, "\n")] = 0;
-        players[i].score = 0;
+        printf("Enter name for player %d (up to 49 characters): ", i + 1);
+        scanf("%s", players[i].player_name);
+        while (getchar() != '\n');  
 
-        // Set number of penguins based on the number of players
-        if (numberOfPlayers == 2) players[i].penguins = 4;
-        else if (numberOfPlayers == 3) players[i].penguins = 3;
-        else players[i].penguins = 2;
+        if (strlen(players[i].player_name) > MAX_NAME_LENGTH) {
+            printf("Name entered is too long. Please enter a name up to 49 characters.\n");
+
+
+        scanf("%s", players[i].player_name);
+        }
+
+        players[i].score = 0;
+        
+if (numberOfPlayers == 2) {
+            players[i].penguins = 4;
+         }
+    else if (numberOfPlayers == 3) {
+         
+            players[i].penguins = 3;
     }
+     else {
+            players[i].penguins = 2;
+        }
+    }
+}
+
+int main() {
+    setupPlayers();
+    
+    return 0;
 }
