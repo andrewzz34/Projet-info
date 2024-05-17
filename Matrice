@@ -1,24 +1,50 @@
 #include <stdio.h>
-#define MAX_ELEMENTS 8  // Nombre total d'éléments à afficher
+#define MAX_ROWS 5  // Nombre de lignes de la matrice
+#define MAX_COLS 2  // Nombre de colonnes de la matrice (chaque "colonne" logique contient 2 valeurs dans l'affichage)
+#define MAX_ELEMENTS 12  // Nombre total d'éléments à afficher
 
-int main() {
-    int numbers[MAX_ELEMENTS] = {1, 2, 3, 4, 5, 6, 7, 8};  // Initialisation du tableau
-    int index = 0;  // Index pour suivre la position actuelle dans le tableau
-
-    // Boucle à travers chaque élément du tableau en utilisant l'index pour contrôler l'accès
-    for (int i = 0; i < MAX_ELEMENTS; i++) {
-        if (index < MAX_ELEMENTS) {
-            if (i % 2 == 0 && index < MAX_ELEMENTS - 1) {
-                // Pour les lignes paires (dans l'indexation 0), affichez deux éléments
-                printf("%d   %d\n", numbers[index], numbers[index + 1]);
-                index += 2;  // Incrémentez l'index de 2 pour les prochains éléments
+void initMatrix(int matrix[MAX_ROWS][MAX_COLS], int numbers[MAX_ELEMENTS]) {
+    int index = 0;
+    for (int i = 0; i < MAX_ROWS; i++) {
+        for (int j = 0; j < MAX_COLS; j++) {
+            if (index < MAX_ELEMENTS) {
+                matrix[i][j] = numbers[index++];
             } else {
-                // Pour les lignes impaires, affichez un seul élément centré
-                printf("  %d\n", numbers[index]);
-                index += 1;  // Incrémentez l'index de 1 pour le prochain élément
+                matrix[i][j] = 0;  // Remplir les cases restantes avec 0 ou une autre valeur par défaut
             }
         }
     }
+}
+
+void printMatrix(int matrix[MAX_ROWS][MAX_COLS]) {
+    int index = 0;
+    for (int i = 0; i < MAX_ROWS; i++) {
+        if (i % 2 == 0) {
+            // Afficher deux éléments
+            for (int j = 0; j < MAX_COLS; j++) {
+                if (index < MAX_ELEMENTS) {
+                    printf("%d   ", matrix[i][j]);
+                    index++;
+                }
+            }
+            printf("\n");
+        } else {
+            // Afficher un élément centré
+            if (index < MAX_ELEMENTS) {
+                printf("  %d\n", matrix[i][0]);
+                index++;
+            }
+        }
+    }
+}
+
+int main() {
+    int numbers[MAX_ELEMENTS] = {1, 2, 3, 4, 5, 6, 7, 8};  // Initialisation du tableau
+    int matrix[MAX_ROWS][MAX_COLS];
+
+    initMatrix(matrix, numbers);
+    printMatrix(matrix);
+    printf("%d, %d", matrix[0][0], matrix[1][1]);
 
     return 0;
 }
