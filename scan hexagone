@@ -1,0 +1,44 @@
+void scanHexagon(Tile board[MAX_ROWS][MAX_COLS], int row, int col) {
+    if (row < 0 || row >= MAX_ROWS || col < 0 || col >= MAX_COLS) {
+        printf("Hexagon out of bounds.\n");
+        return;
+    }
+
+    Tile hex = board[row][col];
+
+    if (hex.fish == 0) {
+        printf("Hexagon at (%d, %d) is removed.\n", row, col);
+        return;
+    }
+
+    printf("Hexagon at (%d, %d) has %d fish.\n", row, col, hex.fish);
+
+    if (hex.player == -1) {
+        printf("Hexagon is unoccupied.\n");
+    } else {
+        printf("Hexagon is occupied by player %d.\n", hex.player);
+    }
+}
+
+// Function to count the total number of fish and penguins on the board
+void countFishAndPenguins(Tile board[MAX_ROWS][MAX_COLS], int rows, int cols) {
+    int totalFish = 0;
+    int totalPenguins = 0;
+    int playerPenguins[MAX_PLAYERS] = {0};
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            totalFish += board[i][j].fish;
+            if (board[i][j].player != -1) {
+                totalPenguins++;
+                playerPenguins[board[i][j].player]++;
+            }
+        }
+    }
+
+    printf("Total number of fish on the board: %d\n", totalFish);
+    printf("Total number of penguins on the board: %d\n", totalPenguins);
+    for (int i = 0; i < numberOfPlayers; i++) {
+        printf("Player %d (%s) has %d penguins.\n", i + 1, players[i].player_name, playerPenguins[i]);
+    }
+}
