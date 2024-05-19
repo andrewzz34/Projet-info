@@ -1,0 +1,215 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
+
+#define MAX_ROWS 9
+#define MAX_COLS 9
+
+#define MAX_PLAYERS 6
+#define MAX_NAME_LENGTH 49
+#define PLAYER_NAME_BUFFER 50 
+
+typedef struct {
+    int fish;  
+    int player;  
+} Tile;
+
+typedef struct {
+    char player_name[PLAYER_NAME_BUFFER];
+    int score;
+    int penguins; 
+} Player;
+
+Player players[MAX_PLAYERS];
+int numberOfPlayers;  // Global variable to hold the number of players
+
+void setupPlayers() {
+    printf("Enter the number of players (2 to 6): ");
+    scanf("%d", &numberOfPlayers);
+    while (getchar() != '\n');
+
+    while (numberOfPlayers < 2 || numberOfPlayers > 6) {
+        printf("Invalid number of players, please enter a number between 2 and 6: ");
+        scanf("%d", &numberOfPlayers);
+        while (getchar() != '\n');  
+    }
+
+    for (int i = 0; i < numberOfPlayers; i++) {
+        printf("Enter name for player %d (up to 49 characters): ", i + 1);
+        scanf("%s", players[i].player_name);
+        while (getchar() != '\n');  
+
+        while (strlen(players[i].player_name) > MAX_NAME_LENGTH) {
+            printf("Name entered is too long. Please enter a name up to 49 characters.\n");
+            printf("Enter name for player %d (up to 49 characters): ", i + 1);
+            scanf("%s", players[i].player_name);
+            while (getchar() != '\n');  
+        }
+
+        players[i].score = 0;
+
+        if (numberOfPlayers == 2) {
+            players[i].penguins = 4;
+        } else if (numberOfPlayers == 3) {
+            players[i].penguins = 3;
+        } else {
+            players[i].penguins = 2;
+        }
+    }
+}
+
+// Function to initialize the game board with random fish counts (1-3 fish per tile)
+void initializeBoard(Tile board[MAX_ROWS][MAX_COLS], int rows, int cols) {
+    srand(time(NULL));
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            board[i][j].fish = rand() % 3 + 1; // Random number of fish between 1 and 3
+            board[i][j].player = -1; // No player initially on the tile
+        }
+    }
+}
+
+// Function to print a line of hexagons
+void printHexagonLine(int num_hexagons) {
+    printf("\n");
+
+    for (int i = 0; i < num_hexagons; i++) {
+        printf(" /      \\ ");
+        printf("      ");
+    }
+    printf("\n");
+    for (int i = 0; i < 1; i++) {
+        for (int j = 0; j < num_hexagons - 1; j++) {
+            printf("/        \\");
+            printf("______");  
+        }
+        printf("/        \\");
+    }
+    printf("\n");
+    for (int i = 0; i < num_hexagons; i++) {
+        printf("\\        /");
+        printf("      ");
+    }
+    printf("\n");
+    for (int i = 0; i < num_hexagons; i++) {
+        printf(" \\______/ ");
+        printf("      ");
+    }
+}
+
+// Function to display the hexagonal game board with player names and scores
+void printGameBoard(int rows, int cols, int num_players) {
+    // Display player names and scores
+    printf("Players:\n");
+    for (int i = 0; i < num_players; i++) {
+        printf("Player %d: %s\n", i + 1, players[i].player_name);
+    }
+    printf("\n");
+
+    // Display the game board
+    printf("\x1B[1;1H");
+    for (int i = 0; i < cols; i++) {
+        printf("  ______  ");
+        printf("      ");
+    }
+
+    for (int i = 0; i < rows; i++) {
+        printHexagonLine(cols);
+    }
+    printf("\x1B[3;5H\x1B[48;2;255;128;0m🐧");
+    printf("\x1B[48;2;0;0;0m");
+
+    // Display the number of fish on each tile
+}
+
+// Function to scan a specific hexagon and print its details
+void scanHexagon(Tile board[MAX_ROWS][MAX_COLS], int row, int col) {
+    if (row < 0 || row >= MAX_ROWS || col < 0 || col >= MAX_COLS) {
+        printf("Hexagon out of bounds.\n");
+        return;
+    }
+
+    Tile hex = board[row][col];
+
+    if (hex.fish == 0) {
+        printf("Hexagon at (%d, %d) is removed.\n", row, col);
+        return;
+    }
+
+    printf("Hexagon at (%d, %d) has %d fish.\n", row, col, hex.fish);
+
+    if (hex.player == -1) {
+        printf("Hexagon is unoccupied.\n");
+    } else {
+        printf("Hexagon is occupied by player %d.\n", hex.player);
+    }
+}
+
+// Function to count the total number of fish and penguins on the board
+void countFishAndPenguins(Tile board[MAX_ROWS][MAX_COLS], int rows, int cols) {
+    int totalFish = 0;
+    int totalPenguins = 0;
+    int playerPenguins[MAX_PLAYERS] = {0};
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            totalFish += board[i][j].fish;
+            if (board[i][j].player != -1) {
+                totalPenguins++;
+                playerPenguins[board[i][j].player]++;
+            }
+        }
+    }
+
+    printf("Total number of fish on the board: %d\n", totalFish);
+    printf("Total number of penguins on the board: %d\n", totalPenguins);
+    for (int i = 0; i < numberOfPlayers; i++) {
+        printf("Player %d (%s) has %d penguins.\n", i + 1, players[i].player_name, playerPenguins[i]);
+    }
+}
+
+int main() {
+    Tile board[MAX_ROWS][MAX_COLS];
+    int rows, cols;
+
+    setupPlayers();
+    system("clear"); 
+
+    // Prompt for board size
+    printf("Number of rows for the game board: ");
+    scanf("%d", &rows);
+    printf("Number of columns for the game board: ");
+    scanf("%d", &cols);
+
+    // Validate the board size
+    if (rows < 1 || cols < 1 || rows > MAX_ROWS || cols > MAX_COLS) {
+        printf("Invalid board size. Please choose dimensions between 1 and 9.\n");
+        return 1;
+    }
+
+    // Initialize the game board
+    initializeBoard(board, rows, cols);
+
+    // Display the game board
+    printGameBoard(rows, cols, numberOfPlayers);
+
+    printf("\x1B[23;22H🐧\n");
+
+    printf("\x1B[40;20H\n");
+
+    // Example of scanning a specific hexagon
+    int row_to_scan, col_to_scan;
+    printf("Enter the row of the hexagon to scan: ");
+    scanf("%d", &row_to_scan);
+    printf("Enter the column of the hexagon to scan: ");
+    scanf("%d", &col_to_scan);
+
+    scanHexagon(board, row_to_scan, col_to_scan);
+
+    // Count and print the total number of fish and penguins on the board
+    countFishAndPenguins(board, rows, cols);
+
+    return 0;
+}
