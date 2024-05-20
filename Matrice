@@ -1,50 +1,62 @@
 #include <stdio.h>
-#define MAX_ROWS 5  // Nombre de lignes de la matrice
-#define MAX_COLS 2  // Nombre de colonnes de la matrice (chaque "colonne" logique contient 2 valeurs dans l'affichage)
-#define MAX_ELEMENTS 12  // Nombre total d'éléments à afficher
+#include <stdlib.h>
+#include <time.h>
 
-void initMatrix(int matrix[MAX_ROWS][MAX_COLS], int numbers[MAX_ELEMENTS]) {
-    int index = 0;
-    for (int i = 0; i < MAX_ROWS; i++) {
-        for (int j = 0; j < MAX_COLS; j++) {
-            if (index < MAX_ELEMENTS) {
-                matrix[i][j] = numbers[index++];
-            } else {
-                matrix[i][j] = 0;  // Remplir les cases restantes avec 0 ou une autre valeur par défaut
-            }
+#define MAX_ROWS 3
+#define MAX_COLS 3
+
+// Structure représentant une case du plateau de jeu
+typedef struct {
+    int fishes; // Nombre de poissons sur la case
+    int penguin; // Identifiant du pingouin sur la case, 0 si aucun
+    int occupied; // Indique si la case est occupée (1 pour oui, 0 pour non)
+} Cell;
+
+// Fonction pour initialiser aléatoirement le nombre de poissons sur chaque case
+void initializeBoard(Cell board[][MAX_COLS], int rows, int cols) {
+    srand(time(NULL));
+
+    // Initialiser toutes les cellules avec des poissons aléatoires entre 1 et 3
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            board[i][j].fishes = rand() % 3 + 1; // Entre 1 et 3 poissons
+            board[i][j].penguin = 0; // Aucun pingouin au début
+            board[i][j].occupied = 0; // Case non occupée au début
+        }
+    }
+
+    // Choisir aléatoirement deux cases pour avoir zéro poisson
+    int zeroFishCells = 2;
+    while (zeroFishCells > 0) {
+        int i = rand() % rows;
+        int j = rand() % cols;
+        if (board[i][j].fishes != 0) { // Assurez-vous que la case n'a pas déjà zéro poisson
+            board[i][j].fishes = 0;
+            zeroFishCells--;
+            board[i][j].penguin =1;
         }
     }
 }
 
-void printMatrix(int matrix[MAX_ROWS][MAX_COLS]) {
-    int index = 0;
-    for (int i = 0; i < MAX_ROWS; i++) {
-        if (i % 2 == 0) {
-            // Afficher deux éléments
-            for (int j = 0; j < MAX_COLS; j++) {
-                if (index < MAX_ELEMENTS) {
-                    printf("%d   ", matrix[i][j]);
-                    index++;
-                }
-            }
-            printf("\n");
-        } else {
-            // Afficher un élément centré
-            if (index < MAX_ELEMENTS) {
-                printf("  %d\n", matrix[i][0]);
-                index++;
-            }
+// Fonction pour afficher le tableau de cellules (à des fins de vérification)
+void printBoard(Cell board[][MAX_COLS], int rows, int cols) {
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, occupied=%d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].occupied);
         }
     }
 }
 
 int main() {
-    int numbers[MAX_ELEMENTS] = {1, 2, 3, 4, 5, 6, 7, 8};  // Initialisation du tableau
-    int matrix[MAX_ROWS][MAX_COLS];
+    int rows = MAX_ROWS;
+    int cols = MAX_COLS; 
+    Cell board[MAX_ROWS][MAX_COLS];
 
-    initMatrix(matrix, numbers);
-    printMatrix(matrix);
-    printf("%d, %d", matrix[0][0], matrix[1][1]);
+    // Initialisation du plateau de jeu
+    initializeBoard(board, rows, cols);
+
+    // Affichage du tableau de cellules pour vérification
+    printBoard(board, rows, cols);
 
     return 0;
 }
