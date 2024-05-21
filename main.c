@@ -12,7 +12,7 @@ int main() {
         printf("erreur malloc num_players\n");
         exit(1);
     }
-    
+    system("clear");
     do {
         printf("Enter the number of players (2 to 6): ");
         scanf("%d", num_players);
@@ -23,7 +23,6 @@ int main() {
     	printf("Erreur malloc joueur\n");
     	exit(1);
     }
-    system("clear");
     int rows, cols;
     setupPlayers(players, *num_players);
     // Fixation de la taille du plateau de jeu
