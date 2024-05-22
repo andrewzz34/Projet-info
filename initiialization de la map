@@ -141,6 +141,7 @@ void printGameBoard(int rows, int cols, Player * players, int num_players) {
 
 
 int main() {
+    int rows, cols;
     Player * players = NULL;
     int * num_players = NULL;
     num_players = malloc(sizeof(int));
@@ -159,7 +160,7 @@ int main() {
         printf("Erreur malloc joueur\n");
         exit(1);
     }
-    int rows, cols;
+    
     setupPlayers(players, *num_players);
     // Fixation de la taille du plateau de jeu
     printf("Nombre de lignes du plateau de jeu : ");
@@ -173,9 +174,10 @@ int main() {
         printf("Taille du plateau invalide. Veuillez choisir des dimensions entre 1 et 9.\n");
         return 1;
     }
-    Cell board[MAX_ROWS][MAX_COLS];
+    Cell board[rows][cols];
     initializeBoard(board,rows,cols);
     // Affichage de la zone de jeu
+    
     printGameBoard(rows, cols, players, *num_players);
 
     int a = (4 * rows) + 10;
