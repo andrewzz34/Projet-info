@@ -1,0 +1,242 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define MAX_ROWS 9
+#define MAX_COLS 9
+#define PENGUINS_PER_PLAYER 4
+#define MAX_PLAYERS 6
+
+typedef struct {
+    int fishes; // Nombre de poissons sur la case
+    int penguin; // Identifiant du pingouin sur la case, 0 si aucun
+    int broken; // Indique si la case est occupée (1 pour oui, 0 pour non)
+} Cell;
+
+typedef struct {
+    int playerID;
+    int penguinIDs[PENGUINS_PER_PLAYER]; // Assuming each player has 4 penguins
+char* color;
+} PlayerPenguins;
+
+PlayerPenguins playerPenguinMap[MAX_PLAYERS]; // Maximum of 6 players
+
+
+void setupPlayerPenguins(int num_players) {
+    if (num_players > MAX_PLAYERS) {
+        printf("Error: Number of players exceeds maximum allowed.\n");
+        return;
+    }
+
+    char* colors[MAX_PLAYERS] = {
+        "\x1B[48;2;135;206;235m🐧\x1B[0m", // Sky Blue
+        "\x1B[48;2;255;165;0m🐧\x1B[0m",   // Orange
+        "\x1B[48;2;124;252;0m🐧\x1B[0m",   // Lawn Green
+        "\x1B[48;2;255;0;255m🐧\x1B[0m",   // Magenta
+        "\x1B[48;2;255;255;0m🐧\x1B[0m",   // Yellow
+        "\x1B[48;2;0;255;255m🐧\x1B[0m"    // Cyan
+    };
+
+    for (int i = 0; i < num_players; i++) {
+        playerPenguinMap[i].playerID = i + 1;
+        playerPenguinMap[i].color = colors[i];
+        for (int j = 0; j < PENGUINS_PER_PLAYER; j++) {
+            playerPenguinMap[i].penguinIDs[j] = i * PENGUINS_PER_PLAYER + j + 1;
+        }
+        printf("Player %d: Penguins initialized with color %s.\n", i + 1, playerPenguinMap[i].color);
+    }
+}
+
+void movePenguin(Cell board[][MAX_COLS], int rows, int cols) {
+    int currentRow, currentCol, newRow, newCol;
+
+    // Prompt user to enter current position of the penguin they want to move
+    printf("Enter current position of the penguin (row col): ");
+    scanf("%d %d", &currentRow, &currentCol);
+
+    // Validate the current position
+    if (currentRow < 1 || currentRow > rows || currentCol < 1 || currentCol > cols || board[currentRow-1][currentCol-1].penguin == 0) {
+        printf("Invalid position or no penguin at given position.\n");
+        return;
+    }
+
+    // Clear the penguin from the old position visually
+    // Calculate exact cursor position for the old position
+    printf("\x1B[%d;%dH   ", 2 * currentRow, (currentCol - 1) * 10 + 6); // Adjust column offset
+
+    // Prompt for new position
+    printf("\nEnter new position for the penguin (row col): ");
+    scanf("%d %d", &newRow, &newCol);
+
+    // Validate the new position
+    if (newRow < 1 || newRow > rows || newCol < 1 || newCol > cols || board[newRow-1][newCol-1].penguin != 0 || board[newRow-1][newCol-1].broken) {
+        printf("Invalid move. Either out of bounds, position broken, or already occupied.\n");
+        return;
+    }
+
+    // Move the penguin logically
+    int penguinID = board[currentRow-1][currentCol-1].penguin;
+    board[currentRow-1][currentCol-1].penguin = 0;
+    board[newRow-1][newCol-1].penguin = penguinID;
+
+    // Display the penguin at the new position visually
+    // Calculate exact cursor position for the new position
+    printf("\x1B[%d;%dH🐧", 2 * newRow, (newCol - 1) * 10 + 6); // Adjust column offset
+    printf("\x1B[0;0H"); // Reset cursor position for any subsequent output
+}
+
+
+void initializeBoard(Cell board[][MAX_COLS], int rows, int cols) {
+    srand(time(NULL)); // initialisation de rand()
+
+    // Initialiser toutes les cellules avec des poissons aléatoires entre 1 et 3
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            board[i][j].fishes = rand() % 3 + 1; // Entre 1 et 3 poissons
+            board[i][j].penguin = 0;
+            board[i][j].broken = 0;
+        }
+    }
+
+    // Déterminer le nombre maximum de cases sans poissons possibles
+    int maxZeroFishCells = (rows * cols) - 1; // Total cells minus one already set
+    int zeroFishCells = maxZeroFishCells < 2 ? maxZeroFishCells : 2; // Maximum two, but not exceeding the number of available cells
+
+    board[0][1].fishes = 0; // Set one cell to have zero fish initially
+    while (zeroFishCells > 0) {
+        int i = rand() % rows;
+        int j = rand() % cols;
+        if (board[i][j].fishes != 0) { // Check if the cell already has zero fish
+            board[i][j].fishes = 0;
+            zeroFishCells--;
+        }
+    }
+}
+
+
+
+// Fonction pour afficher une ligne d'hexagones
+void printHexagonLine(Cell board[][MAX_COLS],int cols) {
+
+    printf("\n");
+
+    for (int i = 0; i < cols; i++) {
+        printf(" /      \\ ");
+        printf("      ");
+    }
+    printf("\n");
+    for (int i = 0; i < 1; i++) {
+        for (int j = 0; j < cols-1; j++) {
+            if (board[i][j].fishes == 0){
+                printf("/        \\");
+            }
+            else if(board[i][j].fishes == 1){
+                printf("/   🐟   \\");
+            }
+            else if(board[i][j].fishes == 2){
+                printf("/  🐟🐟  \\");
+            }
+            else if(board[i][j].fishes == 3){
+                printf("/ 🐟🐟🐟 \\");
+            }
+        printf("______");  
+        }
+        printf("/        \\");
+    }
+    printf("\n");
+    for (int i = 0; i < cols; i++) {
+        printf("\\        /");
+        printf("      ");
+    }
+    printf("\n");
+    for (int i = 0; i < cols; i++) {
+        printf(" \\______/ ");
+        printf("      ");
+    }
+
+}
+
+// Fonction pour afficher la zone de jeu hexagonale avec les noms et scores des joueurs
+void printGameBoard(int rows, int cols, char *player_names[], int num_players,Cell board[][MAX_COLS]) {
+  
+    // Affichage des noms et scores des joueurs
+    printf("Joueurs :\n");
+    for (int i = 0; i < num_players; i++) {
+        printf("Joueur %d : %s\n", i + 1, player_names[i]);
+    }
+    printf("\n");
+
+    // Affichage de la zone de jeu
+    printf("\x1B[1;1H");
+    for (int i = 0; i < cols; i++) {
+        printf("  ______  ");
+        printf("      ");
+    }
+
+    for (int i = 0; i < rows; i++) {
+        printHexagonLine(board,cols);
+    }
+  for(int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+          if (board[i][j].penguin > 0) {
+              
+              // Calculate the cursor position correctly
+              int posY = i ; // 2 lines per hexagon, adjust starting line as needed
+              int posX = j ; // 10 characters wide per hexagon
+              printf("\x1B[%d;%dH\x1B[48;2;255;128;0m🐧\x1B[0m", posY, posX);
+          }
+        
+        }
+      
+  }
+
+    //
+
+
+    // Affichage du nombre de poissons sur chaque case
+
+}
+int main() {
+    system("clear"); 
+    int num_players;
+    char *player_names[MAX_PLAYERS];
+    int rows, cols;
+
+    printf("Nombre de joueurs (entre 2 et 6) : ");
+    scanf("%d", &num_players);
+    if (num_players < 2 || num_players > 6) {
+        printf("Nombre de joueurs invalide. Veuillez entrer un nombre entre 2 et 6.\n");
+        return 1;
+    }
+
+    for (int i = 0; i < num_players; i++) {
+        player_names[i] = (char *)malloc(50 * sizeof(char));
+        printf("Nom du joueur %d : ", i + 1);
+        scanf("%s", player_names[i]);
+    }
+
+    printf("Nombre de lignes du plateau de jeu : ");
+    scanf("%d", &rows);
+    printf("Nombre de colonnes du plateau de jeu : ");
+    scanf("%d", &cols);
+    if (rows < 1 || cols < 1 || rows > MAX_ROWS || cols > MAX_COLS) {
+        printf("Taille du plateau invalide. Veuillez choisir des dimensions entre 1 et 9.\n");
+        return 1;
+    }
+
+    Cell board[MAX_ROWS][MAX_COLS];
+    initializeBoard(board, rows, cols);
+    setupPlayerPenguins(num_players);
+    printGameBoard(rows, cols, player_names, num_players, board);
+
+    // Game loop - example of one iteration, add loop/conditions as necessary
+    movePenguin(board, rows, cols);
+    printGameBoard(rows, cols, player_names, num_players, board);
+
+    // Clean up
+    for (int i = 0; i < num_players; i++) {
+        free(player_names[i]);
+    }
+
+    return 0;
+}
