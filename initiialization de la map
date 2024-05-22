@@ -102,13 +102,40 @@ void initializeBoard(Cell board[][MAX_COLS], int rows, int cols) {
             zeroFishCells--;
         }
     }
-      for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, occupied=%d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken);
-            }
-        }
+      
 }
 
+/*
+void printfish(int rows,int cols, Cell board[rows][cols],){
+	printf("\x1B[1;1H");
+	for (int i = 0; i < rows; i++){
+		if(i==0 &){
+			for (int j = 0; j < cols-1; j++){
+				if(j==0||j%2==0){
+					if (board[i][j].fishes == 0){
+						printf("/        \\");
+					}
+					else if(board[i][j].fishes == 1){
+						printf("/   🐟   \\");
+					}
+					else if(board[i][j].fishes == 2){
+						printf("/  🐟🐟  \\");
+					}
+					else if(board[i][j].fishes == 3){
+						printf("/ 🐟🐟🐟 \\");
+					}
+					    
+					    printf("______");  
+				}				
+				
+			}
+		}
+		
+	}
+}
+*/		
+		
+	
 
 
 void printGameBoard(int rows, int cols, Player * players, int num_players) {
@@ -134,9 +161,12 @@ void printGameBoard(int rows, int cols, Player * players, int num_players) {
         printf("Joueur %d : %s\n", i + 1, players[i].player_name);
     }
     printf("\n");
+    
+  
 }
 
 // Fonction pour afficher le tableau de cellules (à des fins de vérification)
+
 
 
 
