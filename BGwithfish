@@ -53,28 +53,29 @@ void printHexagonLine(int cols) {
     
     
 
-    for (int i = 0; i < cols; i++) {
+     for (int i = 0; i < cols - 1; i++) {
         printf(" /      \\");
         printf("       ");
     }
+    printf(" /      \\");
     printf("\n");
     
-        for (int j = 0; j < cols - 1; j++) {
-            printf("/        \\");
-            printf("______");  
-        }
-        printf("/        \\");
+	for (int i = 0; i < cols - 1; i++) {
+	    printf("/        \\");
+	    printf("______");  
+	}
+	printf("/        \\");
     
     printf("\n");
-    for (int i = 0; i < cols; i++) {
+    	for (int i = 0; i < cols - 1; i++) {
         printf("\\        /");
         printf("      ");
-    }
+    }printf("\\        /");
     printf("\n");
-    for (int i = 0; i < cols; i++) {
+	for (int i = 0; i < cols - 1; i++) {
         printf(" \\______/ ");
         printf("      ");
-    }
+    }printf(" \\______/ ");
 }
 
 Cell** initializeBoard(int rows, int cols) {
@@ -121,7 +122,7 @@ Cell** initializeBoard(int rows, int cols) {
     //printf("\x1B[1;1H");
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
-         	int k=(j+(i*4))+1;
+         	int k=(j+(i*9))+1;
          	printf("\x1B[%d;80H",k);	
             printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, occupied=%d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken);
         }
@@ -145,24 +146,43 @@ void printfishes(Cell** board,int rows, int cols){
     for(int j = 0; j < cols; j++){
       if(i==0){
         if(j%2==0){
-          if (board[i][j].fishes == 0){
-            printf("/        \\");
-            printf("______");
-          }
-          else if(board[i][j].fishes == 1){
-            printf("/   🐟   \\");
-            printf("______");
-          }
-          else if(board[i][j].fishes == 2){
-            printf("/  🐟🐟  \\");
-            printf("______");
-          }
-          else if(board[i][j].fishes == 3){
-            printf("/ 🐟🐟🐟 \\");
-            printf("______");
-          }
-  
-          
+        	if(j==cols-1){
+			if (board[i][j].fishes == 0){
+			    printf("/        \\");
+			   
+			  }
+			  else if(board[i][j].fishes == 1){
+			    printf("/   🐟   \\");
+			    
+			  }
+			  else if(board[i][j].fishes == 2){
+			    printf("/  🐟🐟  \\");
+			    
+			  }
+			  else if(board[i][j].fishes == 3){
+			    printf("/ 🐟🐟🐟 \\");
+			    
+			  }
+        	}
+        	else{
+        		 if (board[i][j].fishes == 0){
+			    printf("/        \\");
+			    printf("______");
+			  }
+			  else if(board[i][j].fishes == 1){
+			    printf("/   🐟   \\");
+			    printf("______");
+			  }
+			  else if(board[i][j].fishes == 2){
+			    printf("/  🐟🐟  \\");
+			    printf("______");
+			  }
+			  else if(board[i][j].fishes == 3){
+			    printf("/ 🐟🐟🐟 \\");
+			    printf("______");
+          		  }
+        	}	
+        
         }
       }
       else{
@@ -230,10 +250,10 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     else if(size%2==0){
     size=(size/2);
     }
-    for (int i = 0; i < size; i++) {
+    for (int i = 0; i < size-1; i++) {
         printf("  ______  ");
         printf("      ");
-    }
+    }printf("  ______");
 
     for (int i = 0; i < rows; i++) {
         printHexagonLine(cols);
