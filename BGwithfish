@@ -48,12 +48,9 @@ void printHexagonLine(int cols) {
    
     printf("\n");
      
-    if(cols%2!=0){
+    
     cols = (cols+1)/2;
-    }
-    else if(cols%2==0){
-    cols=(cols/2);
-    }
+    
     
 
     for (int i = 0; i < cols; i++) {
@@ -278,6 +275,9 @@ int main() {
     scanf("%d", &rows);
     printf("Nombre de colonnes du plateau de jeu (nombre impaire recquis): ");
     scanf("%d", &cols);
+    if (cols%2==0){
+    cols +=1;
+    }
     
   
     
