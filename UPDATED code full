@@ -219,7 +219,7 @@ void printfishes(Cell** board,int rows, int cols){
   for(int i = 0; i < rows; i++){
     for(int j = 0; j < cols; j++){
       if(i==0){
-        if(j%2==0){
+        if(j%2==0 || j==0){
           if (board[i][j].fishes == 0){
             printf("/        \\");
             printf("______");
@@ -236,32 +236,32 @@ void printfishes(Cell** board,int rows, int cols){
             printf("/ 🐟🐟🐟 \\");
             printf("______");
           }
-
-
+  
+          
         }
       }
-      else{
-        if(j%2==0){
+      
+        else if(j%2==0){
         int y=4*i+3;
-        int x=j*16+1;
+        int x=8*j+1;
         printf("\x1B[%d;%dH",y,x);
           if (board[i][j].fishes == 0){
             printf("/        \\");
-
+          
           }
           else if(board[i][j].fishes == 1){
             printf("/   🐟   \\");
-
+            
           }
           else if(board[i][j].fishes == 2){
             printf("/  🐟🐟  \\");
-
+            
           }
           else if(board[i][j].fishes == 3){
             printf("/ 🐟🐟🐟 \\");
-
+            
           }
-
+          
         }
       else if(j%2==1){
         int y=(4*i)+1;
@@ -284,7 +284,7 @@ void printfishes(Cell** board,int rows, int cols){
 
         }
       }
-      }
+      
     }
   }
 
