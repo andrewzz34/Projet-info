@@ -114,13 +114,18 @@ void setupPlayers(Player* players, int num_players) {
 
         if (num_players == 2) {
             players[i].penguins = 4;
+            
         } else if (num_players == 3) {
             players[i].penguins = 3;
-        } else {
+        } else if (num_players == 4) {
             players[i].penguins = 2;
+        }
+        else if (num_players == 5 || num_players == 6) {
+            players[i].penguins = 1;
         }
     }
 }
+
 
 void printHexagonLine(int num_hexagons) {
     printf("\n");
