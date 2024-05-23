@@ -260,6 +260,18 @@ int main() {
     scanf("%d", &rows);
     printf("Nombre de colonnes du plateau de jeu : ");
     scanf("%d", &cols);
+    
+    if(cols%2!=0){
+    cols = (cols+1)/2;
+    }
+    else if(cols%2==0){
+    cols=(cols/2);
+    }
+    
+    
+    
+    
+    
 
     // Vérification de la validité de la taille du plateau de jeu
     if (rows < 1 || cols < 1 || rows > MAX_ROWS || cols > MAX_COLS) {
@@ -278,5 +290,7 @@ int main() {
     
     free(players);
     freeBoard(board, rows);
+    
+    
     return 0;
 }
