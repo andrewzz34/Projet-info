@@ -44,11 +44,6 @@ typedef struct {
     }
 } */
 
-void clear_input_buffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) {}  // Clear any excess characters in the input buffer
-}
-
 void setupPlayers(Player* players, int num_players) {
     for (int i = 0; i < num_players; i++) {
         do {
