@@ -118,6 +118,22 @@ Cell** initializeBoard(int rows, int cols) {
            // Debug print
         }
     }
+    
+       // Déterminer le nombre maximum de cases sans poissons possibles
+    int maxZeroFishCells = (rows * cols) - 1; // Total cells minus one already set
+    int zeroFishCells = maxZeroFishCells < 2 ? maxZeroFishCells : 2; // Maximum two, but not exceeding the number of available cells
+
+    board[0][1].fishes = 0; // Set one cell to have zero fish initially
+    zeroFishCells--;
+    while (zeroFishCells > 0) {
+        int i = rand() % rows;
+        int j = rand() % cols;
+        if (board[i][j].fishes != 0) { // Check if the cell already has zero fish
+            board[i][j].fishes = 0;
+            zeroFishCells--;
+           // Debug print
+        }
+    }
 
     //printf("\x1B[1;1H");
     for (int i = 0; i < rows; i++) {
@@ -284,6 +300,18 @@ void movepenguin(){
         printf("\x1B[%d;%dH🐧",posy,posx);
         
     }
+    
+    else{
+    	newcols = newcols-1;
+        int posx= 13+(newcols*4);
+        int posy= 6+((newrows-1)*4);
+        printf("\x1B[%d;%dH🐧",posy,posx);
+        
+    }
+    
+
+    
+    
 }
 
 
