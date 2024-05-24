@@ -21,7 +21,7 @@ typedef struct {
     int broken; // Indique si la case est occupée (1 pour oui, 0 pour non)
 } Cell;
 
-void setupPlayers(Player* players, int num_players) {
+/* void setupPlayers(Player* players, int num_players) {
     for (int i = 0; i < num_players; i++) {
         printf("Enter name for player %d (up to 49 characters): ", i + 1);
         scanf("%49s", players[i].player_name); // Limite l'entrée pour éviter le débordement de tampon
@@ -40,6 +40,41 @@ void setupPlayers(Player* players, int num_players) {
             players[i].penguins = 3;
         } else {
             players[i].penguins = 2;
+        }
+    }
+} */
+
+void clear_input_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {}  // Clear any excess characters in the input buffer
+}
+
+void setupPlayers(Player* players, int num_players) {
+    for (int i = 0; i < num_players; i++) {
+        do {
+            printf("Enter name for player %d (up to %d characters): ", i + 1, MAX_NAME_LENGTH);
+            if (fgets(players[i].player_name, sizeof(players[i].player_name), stdin)) {
+                // Remove newline character if present
+                players[i].player_name[strcspn(players[i].player_name, "\n")] = 0;
+            }
+            if (strlen(players[i].player_name) > MAX_NAME_LENGTH) {
+                printf("Name entered is too long. Please enter a name up to %d characters.\n", MAX_NAME_LENGTH);
+                clear_input_buffer();  // Ensure buffer is clean for next input
+            } else {
+                break;  // Exit loop if input is valid
+            }
+        } while (1);
+
+        players[i].score = 0; // Initialize score to zero
+
+        // Determine number of penguins based on number of players
+        switch (num_players) {
+            case 2:
+                players[i].penguins = 4; break;
+            case 3:
+                players[i].penguins = 3; break;
+            default:
+                players[i].penguins = 2; break;
         }
     }
 }
@@ -284,7 +319,7 @@ int get_valid_coordinate(const char* prompt, int max_value) {
 }
 
 
-void movePenguin(int rows, int cols) {
+void movepenguin(int rows, int cols) {
     printf("\x1B[30;1H");
 
     int oldrows = get_valid_coordinate("Sur quelle ligne se situe le penguin que vous voulez deplacer", rows);
