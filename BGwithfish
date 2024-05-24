@@ -12,8 +12,7 @@
 typedef struct {
     char player_name[PLAYER_NAME_BUFFER];
     int score;
-    int penguins;
-    int pengtab[4];
+    int penguins; 
 } Player;
 
 typedef struct {
@@ -103,7 +102,7 @@ Cell** initializeBoard(int rows, int cols) {
             }
         }
     }
-
+  
     //printf("\x1B[1;1H");
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -257,7 +256,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
 }
 
 void movepenguin(){
-printf("\x1B[35;1H");
+    printf("\x1B[35;1H");
     int newrows =0;
     int newcols =0;
     printf("sur quelle ligne voulez vous deplacer votre penguin ?\n");
@@ -278,11 +277,40 @@ printf("\x1B[35;1H");
         printf("\x1B[%d;%dH🐧",posy,posx);
         
     }
+}
+
+
     
+void affichePenguin(Cell** board, int rows, int cols) {
+    srand(time(NULL)); // Initialize random number generator for different outcomes each run
+	for(int i=0;i<12;i++){
+      	    int newrows =rand() % rows-1 + 1;;
+	    int newcols =rand() % cols-1 + 1;;
+	   
+	   if (newrows ==0){
+	   newrows+=1;
+	   }
+	    if(newcols%2==0){
+		int posx= 5+(newcols*8);
+		int posy= 4+(newrows*4);
+		printf("\x1B[%d;%dH🐧",posy,posx);
+		
+	    }
+	    
+	    else{
+	    	newcols = newcols-1;
+		int posx= 13+(newcols*8);
+		int posy= 6+((newrows-1)*4);
+		printf("\x1B[%d;%dH🐧",posy,posx);
+        
+    		}
+    }
+}
+
 
     
     
-}
+
 
 
 int main() {
@@ -329,9 +357,10 @@ int main() {
     
     // Affichage de la zone de jeu
     printGameBoard(board,rows, cols, players, num_players);
+    affichePenguin(board, rows, cols);
     for(int i=0;i<10;i++){
-
     movepenguin();
+    printf("\x1B[20;1H");
     }
    
 
@@ -343,4 +372,6 @@ int main() {
     
     
     return 0;
+    
+    
 }
