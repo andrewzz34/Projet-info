@@ -261,46 +261,58 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     printf("\n");
 }
 
-void vide_buffer() {
-    while (getchar() != '\n') {
-        // Clear the input buffer
-    }
+void clear_input_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {}
 }
 
-int robustInput(const char* prompt, int min, int max) {
-    int input, verif;
+int get_valid_coordinate(const char* prompt, int max_value) {
+    int value, result;
     do {
-        printf("%s (%d to %d): ", prompt, min, max);
-        verif = scanf("%d", &input);
-        vide_buffer();
-        if (verif != 1 || input < min || input > max) {
-            printf("Invalid input. Please enter a number between %d and %d.\n", min, max);
+        printf("\x1B[K");  // Clear the current line
+        printf("%s (0 to %d): ", prompt, max_value - 1);
+        result = scanf("%d", &value);
+        clear_input_buffer();  // Clear the input buffer after reading
+        
+        if (result != 1 || value < 0 || value >= max_value) {
+            printf("\x1B[1F\x1B[K");  // Move cursor up and clear line
+            printf("Invalid input. Please enter a number between 0 and %d.\n", max_value - 1);
+            printf("\x1B[1E");  // Move cursor down for next prompt
         }
-    } while (verif != 1 || input < min || input > max);
-    return input;
+    } while (result != 1 || value < 0 || value >= max_value);
+    return value;
 }
 
 
 void movePenguin(int rows, int cols) {
     printf("\x1B[30;1H");
 
-    int oldrows, oldcols;
-    int newrows, newcols;
+    int oldrows = get_valid_coordinate("Sur quelle ligne se situe le penguin que vous voulez deplacer", rows);
+    int oldcols = get_valid_coordinate("Sur quelle colonne situe le penguin que vous voulez deplacer", cols);
+    int newrows = get_valid_coordinate("Sur quelle ligne voulez vous deplacer votre penguin", rows);
+    int newcols = get_valid_coordinate("Sur quelle colonne voulez vous deplacer votre penguin", cols);
 
-    oldrows = robustInput("Sur quelle ligne se situe le pingouin que vous voulez déplacer", 0, rows - 1);
-    oldcols = robustInput("Sur quelle colonne se situe le pingouin que vous voulez déplacer", 0, cols - 1);
-    
-    newrows = robustInput("Sur quelle ligne voulez-vous déplacer votre pingouin", 0, rows - 1);
-    newcols = robustInput("Sur quelle colonne voulez-vous déplacer votre pingouin", 0, cols - 1);
+    // Clear the old penguin's position
+    int posxx, posyy;
+    if (oldcols % 2 == 0) {
+        posxx = 5 + (oldcols * 8);
+        posyy = 4 + (oldrows * 4);
+    } else {
+        posxx = 13 + ((oldcols - 1) * 8);
+        posyy = 6 + ((oldrows - 1) * 4);
+    }
+    printf("\x1B[%d;%dH   ", posyy, posxx); // Clear the old penguin's position
 
-    // Calculating the cursor position offsets
-    int old_posx = 5 + (oldcols * 8);
-    int old_posy = 4 + (oldrows * 4);
-    printf("\x1B[%d;%dH   ", old_posy, old_posx); // Clear the old penguin
-
-    int new_posx = 5 + (newcols * 8);
-    int new_posy = 4 + (newrows * 4);
-    printf("\x1B[%d;%dH🐧", new_posy, new_posx); // Place the new penguin
+    // Place the new penguin at the new location
+    int posx, posy;
+    if (newcols % 2 == 0) {
+        posx = 5 + (newcols * 8);
+        posy = 4 + (newrows * 4);
+    } else {
+        posx = 13 + ((newcols - 1) * 8);
+        posy = 6 + ((newrows - 1) * 4);
+    }
+    printf("\x1B[%d;%dH🐧", posy, posx); // Place the penguin at the new location
 
     printf("\x1B[0;0H"); // Reset cursor position
 }
