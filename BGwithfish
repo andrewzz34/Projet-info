@@ -102,39 +102,7 @@ Cell** initializeBoard(int rows, int cols) {
             }
         }
     }
-    /*
-    // Déterminer le nombre maximum de cases sans poissons possibles
-    int maxZeroFishCells = (rows * cols) - 1; // Total cells minus one already set
-    int zeroFishCells = maxZeroFishCells < 2 ? maxZeroFishCells : 2; // Maximum two, but not exceeding the number of available cells
 
-    board[0][1].fishes = 0; // Set one cell to have zero fish initially
-    zeroFishCells--;
-    while (zeroFishCells > 0) {
-        int i = rand() % rows;
-        int j = rand() % cols;
-        if (board[i][j].fishes != 0) { // Check if the cell already has zero fish
-            board[i][j].fishes = 0;
-            zeroFishCells--;
-           // Debug print
-        }
-    }
-    
-       // Déterminer le nombre maximum de cases sans poissons possibles
-    int maxZeroFishCells = (rows * cols) - 1; // Total cells minus one already set
-    int zeroFishCells = maxZeroFishCells < 2 ? maxZeroFishCells : 2; // Maximum two, but not exceeding the number of available cells
-
-    board[0][1].fishes = 0; // Set one cell to have zero fish initially
-    zeroFishCells--;
-    while (zeroFishCells > 0) {
-        int i = rand() % rows;
-        int j = rand() % cols;
-        if (board[i][j].fishes != 0) { // Check if the cell already has zero fish
-            board[i][j].fishes = 0;
-            zeroFishCells--;
-           // Debug print
-        }
-    }
-	*/
     //printf("\x1B[1;1H");
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
@@ -288,6 +256,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
 }
 
 void movepenguin(){
+printf("\x1B[35;1H");
     int newrows =0;
     int newcols =0;
     printf("sur quelle ligne voulez vous deplacer votre penguin ?\n");
@@ -361,9 +330,7 @@ int main() {
     printGameBoard(board,rows, cols, players, num_players);
     for(int i=0;i<10;i++){
 
-    
     movepenguin();
-    printf("\x1B[20;1H");
     }
    
 
