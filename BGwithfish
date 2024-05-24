@@ -290,7 +290,9 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     }
     affichePenguin(board, rows, cols);
     printfishes(board,rows,cols);
-    printf("\x1B[4;5H\x1B[48;2;255;128;0m🐧\x1B[0m");
+    printf("\x1B[4;120H       👑");
+    printf("\x1B[5;120H Bob : ");
+    printf("\x1B[5;127H\x1B[48;2;255;128;0m🐧\x1B[0m");
 
     // Affichage des noms et scores des joueurs
     printf("\x1B[%d;0H\n", a);
