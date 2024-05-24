@@ -12,7 +12,8 @@
 typedef struct {
     char player_name[PLAYER_NAME_BUFFER];
     int score;
-    int penguins; 
+    int penguins;
+    int pengtab[4];
 } Player;
 
 typedef struct {
