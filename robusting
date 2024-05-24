@@ -346,7 +346,22 @@ void affichePenguin(Cell** board, int rows, int cols) {
 }
 
 
-    
+
+int better_scan(const char *format, ...) {
+    int ret_var = 0;
+    int value;
+    va_list args;
+
+    va_start(args, format);
+    do {
+        vprintf(format, args);  // Use the format string and args
+        ret_var = scanf("%d", &value);
+        while (getchar() != '\n');  // Clear the input buffer
+    } while (ret_var != 1);
+    va_end(args);
+
+    return value;
+}
     
 
 
@@ -357,15 +372,17 @@ int main() {
     int num_players;
     
     system("clear");
-    do {
-        printf("Enter the number of players (2 to 6): ");
-        scanf("%d", &num_players);
-    } while (num_players < 2 || num_players > 6);
+    num_players = better_scan("Enter the number of players (2 to 6): ");
+
+    if (num_players < 2 || num_players > 6) {
+        printf("Number of players must be between 2 and 6.\n");
+        exit(EXIT_FAILURE);
+    }
 
     players = malloc(sizeof(Player) * num_players);
     if (players == NULL) {
-        printf("Erreur malloc joueur\n");
-        exit(1);
+        printf("Error allocating memory for players\n");
+        exit(EXIT_FAILURE);
     }
     
     setupPlayers(players, num_players);
@@ -378,11 +395,6 @@ int main() {
     if (cols%2==0){
     cols +=1;
     }
-    
-    
-  
-    
-    
     
 
     // Vérification de la validité de la taille du plateau de jeu
