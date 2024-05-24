@@ -90,13 +90,19 @@ Cell** initializeBoard(int rows, int cols) {
     // Initialiser toutes les cellules avec des poissons aléatoires entre 1 et 3
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
+            int luck= rand() % 2 + 1;	
             if(i==0 && j%2 !=0){
             board[i][j].fishes = 0;
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
             }
-            else{
+            else if(luck==1) {
             board[i][j].fishes = rand() % 3 + 1; // Entre 1 et 3 poissons
+            board[i][j].penguin = 0;
+            board[i][j].broken = 0;
+            }
+            else{
+            board[i][j].fishes = rand() % 2 + 2; // Entre 2 et 3 poissons
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
             }
@@ -263,16 +269,30 @@ void movepenguin(){
     int newcols =0;
     printf("sur quelle ligne se situe le penguin que voulez vous deplacer ?\n");
     scanf("%d",&oldrows);
+    printf("\x1B[F"); // Déplace le curseur vers la ligne précédente
+    printf("\x1B[K"); // Efface la ligne actuelle à partir de la position du curseur
+    printf("\x1B[E"); // Déplace le curseur vers la ligne précédente
+
     printf("sur quelle colonne situe le penguin que voulez vous deplacer ?\n");
     scanf("%d",&oldcols);
-
+    printf("\x1B[F"); // Déplace le curseur vers la ligne précédente
+    printf("\x1B[K"); // Efface la ligne actuelle à partir de la position du curseur
+    printf("\x1B[E"); // Déplace le curseur vers la ligne précédente
+	
+    printf("sur quelle ligne voulez vous deplacer votre penguin ?\n"); 
+    scanf("%d",&newrows);
+    printf("\x1B[F"); // Déplace le curseur vers la ligne précédente
+    printf("\x1B[K"); // Efface la ligne actuelle à partir de la position du curseur
+    printf("\x1B[E"); // Déplace le curseur vers la ligne précédente
+    
+    printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
+    scanf("%d",&newcols);
+    printf("\x1B[F"); // Déplace le curseur vers la ligne précédente
+    printf("\x1B[K"); // Efface la ligne actuelle à partir de la position du curseur
+    printf("\x1B[E"); // Déplace le curseur vers la ligne précédente
 
 
     
-        printf("sur quelle ligne voulez vous deplacer votre penguin ?\n");
-    scanf("%d",&newrows);
-    printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
-    scanf("%d",&newcols);
     if(oldcols%2==0){
         int posxx= (5+(oldcols*8));
         int posyy= (4+(oldrows*4));
@@ -377,7 +397,7 @@ int main() {
         free(players);
         return 1;
     }
-    
+    system("clear");
     Cell** board = initializeBoard(rows, cols);
     
     // Affichage de la zone de jeu
