@@ -236,71 +236,6 @@ void printfishes(Cell** board,int rows, int cols){
 }
 
 
-void printPenguin(Cell** board,int rows, int cols){
-  printf("\x1B[3;1H");
-  for(int i = 0; i < rows; i++){
-    for(int j = 0; j < cols; j++){
-      if(i==0){
-        if(j%2==0){
-        	if(j==cols-1){
-			if (board[i][j].penguin == 0){
-			    printf("/        \\");
-			   
-			  }
-			  else if(board[i][j].penguin == 1){
-			    printf("/   🐧   \\");
-			    
-			  }
-			          	}
-        	else{
-        		 if (board[i][j].penguin == 0){
-			    printf("/        \\");
-			    printf("______");
-			  }
-			  else if(board[i][j].penguin == 1){
-			    printf("/   🐧   \\");
-			    printf("______");
-			  }
-			          	}	
-        
-        }
-      }
-      else{
-        if(j%2==0){
-        int y=4*i+3;
-        int x=(j*8)+1;
-        printf("\x1B[%d;%dH",y,x);
-          if (board[i][j].fishes == 0){
-            printf("/        \\");
-          
-          }
-          else if(board[i][j].penguin == 1){
-            printf("/   🐧   \\");
-            
-          }
-                   
-        }
-      else if(j%2==1){
-        int y=(4*i)+1;
-        int x=9+(8*(j-1));
-        printf("\x1B[%d;%dH",y,x);
-        if (board[i][j].penguin == 0){
-          printf("/        \\");
-
-        }
-        else if(board[i][j].penguin == 1){
-          printf("/   🐧   \\");
-
-        }
-              }
-      }
-    }
-  }
-
-}
-
-
-
 
 
 void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_players) {
@@ -324,7 +259,6 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
         printHexagonLine(cols);
     }
     printfishes(board,rows,cols);
-printPenguin(board,rows,cols);
     printf("\x1B[3;5H\x1B[48;2;255;128;0m🐧\x1B[0m");
 
     // Affichage des noms et scores des joueurs
@@ -350,6 +284,29 @@ void movepenguin(){
         printf("\x1B[%d;%dH🐧",posy,posx);
         
     }
+}
+
+
+void affichePenguin(Cell** board, int rows, int cols) {
+    srand(time(NULL)); // Initialize random number generator for different outcomes each run
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (j % 2 == 0) {  // Process only even columns
+                if (board[i][j].penguin == 0 && !board[i][j].broken) { // Ensure the cell is empty and not broken
+                    // Calculate positions for display using the even column formula
+                    int posx = 5 + (j * 8);
+                    int posy = 4 + (i * 4);
+                    if (rand() % 2) { // Randomly decide to place a penguin or not
+                        printf("\x1B[%d;%dH🐧", posy, posx);
+                        board[i][j].penguin = 1; // Update the board to reflect a penguin is now here
+                    }
+                }
+            }
+        }
+    }
+
+    printf("\x1B[0;0H"); // Reset cursor position after printing
 }
 
 
@@ -397,8 +354,13 @@ int main() {
     
     // Affichage de la zone de jeu
     printGameBoard(board,rows, cols, players, num_players);
-    
-   movepenguin();
+    for(int i=0;i<10;i++){
+
+    affichePenguin(board, rows, cols);
+    movepenguin();
+    printf("\x1B[20;1H");
+    }
+   
 
     int a = (4 * rows) + 10;
     printf("\x1B[%d;0H\n", a);
