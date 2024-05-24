@@ -271,6 +271,22 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     printf("\n");
 }
 
+void movepenguin(){
+    int newrows =0;
+    int newcols =0;
+    printf("sur quelle ligne voulez vous deplacer votre penguin ?\n");
+    scanf("%d",&newrows);
+    printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
+    scanf("%d",&newcols);
+    if(newcols%2==0){
+        int posx= 5+(newcols*8);
+        int posy= 4+(newrows*4);
+        printf("\x1B[%d;%dH🐧",posy,posx);
+        
+    }
+}
+
+
 int main() {
     int rows, cols;
     Player* players = NULL;
@@ -315,6 +331,8 @@ int main() {
     
     // Affichage de la zone de jeu
     printGameBoard(board,rows, cols, players, num_players);
+    
+   movepenguin();
 
     int a = (4 * rows) + 10;
     printf("\x1B[%d;0H\n", a);
