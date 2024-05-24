@@ -47,11 +47,7 @@ void setupPlayers(Player* players, int num_players) {
 void printHexagonLine(int cols) {
    
     printf("\n");
-     
-    
     cols = (cols+1)/2;
-    
-    
 
      for (int i = 0; i < cols - 1; i++) {
         printf(" /      \\");
@@ -77,6 +73,16 @@ void printHexagonLine(int cols) {
         printf("      ");
     }printf(" \\______/ ");
 }
+void printboard(Cell** board,int rows, int cols){
+     for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+         	int k=(j+(i*9))+1;
+         	printf("\x1B[%d;80H",k);	
+            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, occupied=%d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken);
+        }
+    }
+}
+
 
 Cell** initializeBoard(int rows, int cols) {
     srand(time(NULL)); // initialisation de rand()
@@ -110,13 +116,7 @@ Cell** initializeBoard(int rows, int cols) {
     }
   
     //printf("\x1B[1;1H");
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-         	int k=(j+(i*9))+1;
-         	printf("\x1B[%d;80H",k);	
-            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, occupied=%d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken);
-        }
-    }
+    printboard(board,rows,cols);// a titre vérificatif
 
     // Retourner le pointeur vers le tableau
     return board;
@@ -198,27 +198,27 @@ void printfishes(Cell** board,int rows, int cols){
           }
           
         }
-      else if(j%2==1){
-        int y=(4*i)+1;
-        int x=9+(8*(j-1));
-        printf("\x1B[%d;%dH",y,x);
-        if (board[i][j].fishes == 0){
-          printf("/        \\");
+	      else if(j%2==1){
+		int y=(4*i)+1;
+		int x=9+(8*(j-1));
+		printf("\x1B[%d;%dH",y,x);
+		if (board[i][j].fishes == 0){
+		  printf("/        \\");
 
-        }
-        else if(board[i][j].fishes == 1){
-          printf("/   🐟   \\");
+		}
+		else if(board[i][j].fishes == 1){
+		  printf("/   🐟   \\");
 
-        }
-        else if(board[i][j].fishes == 2){
-          printf("/  🐟🐟  \\");
+		}
+		else if(board[i][j].fishes == 2){
+		  printf("/  🐟🐟  \\");
 
-        }
-        else if(board[i][j].fishes == 3){
-          printf("/ 🐟🐟🐟 \\");
+		}
+		else if(board[i][j].fishes == 3){
+		  printf("/ 🐟🐟🐟 \\");
 
-        }
-      }
+        	}		
+             }		
       }
     }
   }
@@ -261,35 +261,44 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     printf("\n");
 }
 
-void movepenguin(){
+void movepenguin(int rows, int cols){
     printf("\x1B[30;1H");
     int oldrows =0;
     int oldcols =0;
     int newrows =0;
     int newcols =0;
+    
+    printf("\x1B[K");
     printf("sur quelle ligne se situe le penguin que voulez vous deplacer ?\n");
     scanf("%d",&oldrows);
-    printf("\x1B[F"); // Déplace le curseur vers la ligne précédente
-    printf("\x1B[K"); // Efface la ligne actuelle à partir de la position du curseur
-    printf("\x1B[E"); // Déplace le curseur vers la ligne précédente
+    printf("\x1B[F\x1B[K");
+    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
 
+    printf("\x1B[K");
     printf("sur quelle colonne situe le penguin que voulez vous deplacer ?\n");
     scanf("%d",&oldcols);
-    printf("\x1B[F"); // Déplace le curseur vers la ligne précédente
-    printf("\x1B[K"); // Efface la ligne actuelle à partir de la position du curseur
-    printf("\x1B[E"); // Déplace le curseur vers la ligne précédente
-	
+    printf("\x1B[F\x1B[K");
+    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
+   
+   
+    do{
+    printf("\x1B[K");
     printf("sur quelle ligne voulez vous deplacer votre penguin ?\n"); 
     scanf("%d",&newrows);
-    printf("\x1B[F"); // Déplace le curseur vers la ligne précédente
-    printf("\x1B[K"); // Efface la ligne actuelle à partir de la position du curseur
-    printf("\x1B[E"); // Déplace le curseur vers la ligne précédente
+    printf("\x1B[F\x1B[K");
+    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
+    if (newrows > rows || newrows < 0) {
+        printf("\x1B[2F");   
+        printf("La valeur entrée n'est pas valide. Veuillez entrer une valeur entre 0 et %d.\n", rows-1);	   
+    }   
+    }while (newrows > rows || newrows < 0);
     
+    
+    printf("\x1B[K");
     printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
     scanf("%d",&newcols);
-    printf("\x1B[F"); // Déplace le curseur vers la ligne précédente
-    printf("\x1B[K"); // Efface la ligne actuelle à partir de la position du curseur
-    printf("\x1B[E"); // Déplace le curseur vers la ligne précédente
+    printf("\x1B[F\x1B[K");
+    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
 
 
     
@@ -386,6 +395,7 @@ int main() {
     cols +=1;
     }
     
+    
   
     
     
@@ -404,7 +414,7 @@ int main() {
     printGameBoard(board,rows, cols, players, num_players);
     affichePenguin(board, rows, cols);
     for(int i=0;i<10;i++){
-    movepenguin();
+    movepenguin(rows, cols);
     printf("\x1B[20;1H");
     }
    
