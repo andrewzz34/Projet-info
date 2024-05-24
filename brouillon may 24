@@ -309,7 +309,27 @@ void movepenguin(){
         
     }
     
+void affichePenguin(Cell** board, int rows, int cols) {
+    srand(time(NULL)); // Initialize random number generator for different outcomes each run
 
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            if (j % 2 == 0) {  // Process only even columns
+                if (board[i][j].penguin == 0 && !board[i][j].broken) { // Ensure the cell is empty and not broken
+                    // Calculate positions for display using the even column formula
+                    int posx = 5 + (j * 8);
+                    int posy = 4 + (i * 4);
+                    if (rand() % 2) { // Randomly decide to place a penguin or not
+                        printf("\x1B[%d;%dH🐧", posy, posx);
+                        board[i][j].penguin = 1; // Update the board to reflect a penguin is now here
+                    }
+                }
+            }
+        }
+    }
+
+    printf("\x1B[0;0H"); // Reset cursor position after printing
+}
     
     
 }
@@ -361,7 +381,7 @@ int main() {
     printGameBoard(board,rows, cols, players, num_players);
     for(int i=0;i<10;i++){
 
-    
+    affichePenguin(board, rows, cols);
     movepenguin();
     printf("\x1B[20;1H");
     }
