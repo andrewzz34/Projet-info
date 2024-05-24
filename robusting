@@ -346,24 +346,27 @@ void affichePenguin(Cell** board, int rows, int cols) {
 }
 
 
+int better_scan(const char *prompt) {
+    char input[100];  // Buffer to hold input
+    int value, ret_var;
 
-int better_scan(const char *format, ...) {
-    int ret_var = 0;
-    int value;
-    va_list args;
+    while (1) {
+        printf("%s", prompt);
+        if (!fgets(input, sizeof(input), stdin)) {
+            continue;  // If input fails, prompt again
+        }
 
-    va_start(args, format);
-    do {
-        vprintf(format, args);  // Use the format string and args
-        ret_var = scanf("%d", &value);
-        while (getchar() != '\n');  // Clear the input buffer
-    } while (ret_var != 1);
-    va_end(args);
-
-    return value;
-}
-    
-
+        // Try to convert the string to an integer
+        ret_var = sscanf(input, "%d", &value);
+        
+        // Check for valid number range and correct conversion
+        if (ret_var == 1 && value >= 2 && value <= 6) {
+            return value;  // Return the value if it's a valid number
+        }
+        
+        printf("Type in a valid number between 2 and 6.\n");
+    }
+} // fgets and sscanf will avoid a loop once the user types in a character or an invalid number.
 
 
 int main() {
