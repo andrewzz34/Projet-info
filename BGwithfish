@@ -331,8 +331,13 @@ int main() {
     
     // Affichage de la zone de jeu
     printGameBoard(board,rows, cols, players, num_players);
+    for(int i=0;i<10;i++){
+
     
-   movepenguin();
+    movepenguin();
+    printf("\x1B[20;1H");
+    }
+   
 
     int a = (4 * rows) + 10;
     printf("\x1B[%d;0H\n", a);
