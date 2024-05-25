@@ -273,55 +273,51 @@ if (newcols % 2 == 0) {
 
 
 void affichePenguin(Cell** board, int rows, int cols, int num_players) {
-char* colors[MAX_PLAYERS] = {
-    "\x1B[48;2;135;206;235m🐧\x1B[0m", // Sky Blue
-    "\x1B[48;2;255;165;0m🐧\x1B[0m",   // Orange
-    "\x1B[48;2;124;252;0m🐧\x1B[0m",   // Lawn Green
-    "\x1B[48;2;255;0;255m🐧\x1B[0m",   // Magenta
-    "\x1B[48;2;255;255;0m🐧\x1B[0m",   // Yellow
-    "\x1B[48;2;0;255;255m🐧\x1B[0m"    // Cyan
-};
-
-    srand(time(NULL)); // Initialize random number generator for different outcomes each run
-    int posx, posy;
-    int penguins_per_player;
-    if (num_players == 2) {
-        penguins_per_player = 4;
-    } else if (num_players == 3) {
-        penguins_per_player = 3;
-    } else if (num_players >= 4) {
-        penguins_per_player = 2;
+int posx, posy;
+    if (num_players > MAX_PLAYERS) {
+        printf("Error: Number of players exceeds the maximum allowed.\n");
+        return;
     }
 
-    int total_penguins = num_players * penguins_per_player;
-    for (int i = 0; i < total_penguins; i++) {
+    char* colors[MAX_PLAYERS] = {
+        "\x1B[48;2;135;206;235m🐧\x1B[0m", // Sky Blue
+        "\x1B[48;2;255;165;0m🐧\x1B[0m",   // Orange
+        "\x1B[48;2;124;252;0m🐧\x1B[0m",   // Lawn Green
+        "\x1B[48;2;255;0;255m🐧\x1B[0m",   // Magenta
+        "\x1B[48;2;255;255;0m🐧\x1B[0m",   // Yellow
+        "\x1B[48;2;0;255;255m🐧\x1B[0m"    // Cyan
+    };
+
+    srand(time(NULL));
+    int posx, posy, penguins_per_player = num_players >= 4 ? 2 : (num_players == 3 ? 3 : 4);
+
+    for (int i = 0; i < num_players * penguins_per_player; i++) {
         int newrows, newcols;
         do {
             newrows = rand() % rows;
             newcols = rand() % cols;
         } while (board[newrows][newcols].penguin != 0 || (newrows == 0 && newcols % 2 != 0) || board[newrows][newcols].broken == 1);
 
-        // Calculate position for display based on column parity
-        if (newcols % 2 == 0) {
-            posx = 5 + (newcols * 8);
-        } else {
-            posx = 13 + ((newcols - 1) * 8);
-        }
+       if (newcols % 2 == 0) {
+    posx = 5 + (newcols * 8);
+} else {
+    posx = 13 + ((newcols - 1) * 8);
+}
 
-        if (newcols % 2 == 0) {
-            posy = 4 + (newrows * 4);
-        } else {
-            posy = 6 + ((newrows - 1) * 4);
-        }
+// Calculate position for display based on column parity for posy
+if (newcols % 2 == 0) {
+    posy = 4 + (newrows * 4);
+} else {
+    posy = 6 + ((newrows - 1) * 4);
+}
 
-        int player_index = i / penguins_per_player; // Determine which player this penguin belongs to
-        printf("\x1B[%d;%dH%s", posy, posx, colors[player_index]); // Display penguin with player-specific color
+        int player_index = i / penguins_per_player;
+        printf("\x1B[%d;%dH%s", posy, posx, colors[player_index]);
         board[newrows][newcols].penguin = player_index + 1;
         board[newrows][newcols].fishes = 1;
     }
     printboard(board, rows, cols);
 }
-
 
 
 
