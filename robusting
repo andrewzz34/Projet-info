@@ -12,16 +12,18 @@
 typedef struct {
     char player_name[PLAYER_NAME_BUFFER];
     int score;
-    int penguins; 
+    int penguins;
+    int id_player; 
 } Player;
 
 typedef struct {
     int fishes; // Nombre de poissons sur la case
     int penguin; // Identifiant du pingouin sur la case, 0 si aucun
     int broken; // Indique si la case est occupée (1 pour oui, 0 pour non)
+    int playeron;
 } Cell;
 
-/* void setupPlayers(Player* players, int num_players) {
+void setupPlayers(Player* players, int num_players) {
     for (int i = 0; i < num_players; i++) {
         printf("Enter name for player %d (up to 49 characters): ", i + 1);
         scanf("%49s", players[i].player_name); // Limite l'entrée pour éviter le débordement de tampon
@@ -40,36 +42,6 @@ typedef struct {
             players[i].penguins = 3;
         } else {
             players[i].penguins = 2;
-        }
-    }
-} */
-
-void setupPlayers(Player* players, int num_players) {
-    for (int i = 0; i < num_players; i++) {
-        do {
-            printf("Enter name for player %d (up to %d characters): ", i + 1, MAX_NAME_LENGTH);
-            if (fgets(players[i].player_name, sizeof(players[i].player_name), stdin)) {
-                // Remove newline character if present
-                players[i].player_name[strcspn(players[i].player_name, "\n")] = 0;
-            }
-            if (strlen(players[i].player_name) > MAX_NAME_LENGTH) {
-                printf("Name entered is too long. Please enter a name up to %d characters.\n", MAX_NAME_LENGTH);
-                clear_input_buffer();  // Ensure buffer is clean for next input
-            } else {
-                break;  // Exit loop if input is valid
-            }
-        } while (1);
-
-        players[i].score = 0; // Initialize score to zero
-
-        // Determine number of penguins based on number of players
-        switch (num_players) {
-            case 2:
-                players[i].penguins = 4; break;
-            case 3:
-                players[i].penguins = 3; break;
-            default:
-                players[i].penguins = 2; break;
         }
     }
 }
@@ -108,7 +80,7 @@ void printboard(Cell** board,int rows, int cols){
         for (int j = 0; j < cols; j++) {
          	int k=(j+(i*9))+1;
          	printf("\x1B[%d;80H",k);	
-            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, occupied=%d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken);
+            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, broken=%d, Player on is %d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken, board[i][j].playeron);
         }
     }
 }
@@ -131,21 +103,24 @@ Cell** initializeBoard(int rows, int cols) {
             board[i][j].fishes = 0;
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
+            board[i][j].playeron = 0;
             }
             else if(luck==1) {
             board[i][j].fishes = rand() % 3 + 1; // Entre 1 et 3 poissons
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
+            board[i][j].playeron = 0;
             }
             else{
             board[i][j].fishes = rand() % 2 + 2; // Entre 2 et 3 poissons
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
+            board[i][j].playeron = 0;
             }
         }
     }
   
-    //printf("\x1B[1;1H");
+
     printboard(board,rows,cols);// a titre vérificatif
 
     // Retourner le pointeur vers le tableau
@@ -254,6 +229,48 @@ void printfishes(Cell** board,int rows, int cols){
   }
 
 }
+void placePenguinsBasedOnPlayers(Cell** board, int rows, int cols, Player* players, int num_players) {
+    srand(time(NULL)); // Initialize random number generator
+
+    int penguins_per_player;
+    if (num_players == 2) {
+        penguins_per_player = 4;
+    } else if (num_players == 3) {
+        penguins_per_player = 3;
+    } else if (num_players == 4) {
+        penguins_per_player = 2;
+    } else {
+        penguins_per_player = 1;
+    }
+
+    int total_penguins = num_players * penguins_per_player;
+    int placed_penguins = 0;
+
+    while (placed_penguins < total_penguins) {
+        for (int i = 0; i < num_players && placed_penguins < total_penguins; i++) {
+            int row, col;
+            do {
+                row = rand() % rows;
+                col = rand() % cols;
+
+                // Ensure penguins are placed on valid, unoccupied cells
+            } while (board[row][col].penguin != 0 || (row == 0 && col % 2 != 0) || board[row][col].broken == 1);
+
+            // Place a penguin linked to the current player
+            board[row][col].penguin = i + 1; // Player ID starts from 1 to num_players
+            board[row][col].playeron = i + 1; // Reflect the player ID on the cell
+
+            // Displaying the penguin on the board (You might need to adjust this part depending on your board printing logic)
+            int display_row = 4 * row + 3; // Calculate the exact display row
+            int display_col = col % 2 == 0 ? (5 + (col * 8)) : (13 + ((col - 1) * 8)); // Calculate the exact display column based on whether the column is odd or even
+            printf("\x1B[%d;%dH🐧", display_row, display_col);
+
+            placed_penguins++;
+        }
+    }
+
+    printboard(board, rows, cols); // Update the board display after placing all penguins
+}
 
 
 
@@ -278,8 +295,11 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     for (int i = 0; i < rows; i++) {
         printHexagonLine(cols);
     }
+    placePenguinsBasedOnPlayers(board, rows, cols, players, num_players);
     printfishes(board,rows,cols);
-    printf("\x1B[4;5H\x1B[48;2;255;128;0m🐧\x1B[0m");
+    printf("\x1B[4;120H       👑");
+    printf("\x1B[5;130H Bob : ");
+    printf("\x1B[5;137H\x1B[48;2;255;128;0m🐧\x1B[0m");
 
     // Affichage des noms et scores des joueurs
     printf("\x1B[%d;0H\n", a);
@@ -291,112 +311,117 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     printf("\n");
 }
 
-void clear_input_buffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) {}
-}
-
-int get_valid_coordinate(const char* prompt, int max_value) {
-    int value, result;
-    do {
-        printf("\x1B[K");  // Clear the current line
-        printf("%s (0 to %d): ", prompt, max_value - 1);
-        result = scanf("%d", &value);
-        clear_input_buffer();  // Clear the input buffer after reading
-        
-        if (result != 1 || value < 0 || value >= max_value) {
-            printf("\x1B[1F\x1B[K");  // Move cursor up and clear line
-            printf("Invalid input. Please enter a number between 0 and %d.\n", max_value - 1);
-            printf("\x1B[1E");  // Move cursor down for next prompt
-        }
-    } while (result != 1 || value < 0 || value >= max_value);
-    return value;
-}
-
-
-void movepenguin(int rows, int cols) {
+void movepenguin(Cell** board,int rows, int cols){
     printf("\x1B[30;1H");
+    int oldrows =0;
+    int oldcols =0;
+    int newrows =0;
+    int newcols =0;
+    
+    do{
+     
+    printf("\x1B[K");
+    printf("sur quelle ligne se situe le penguin que voulez vous deplacer ?\n");
+    scanf("%d",&oldrows);
+    printf("\x1B[F\x1B[K");
+    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
 
-    int oldrows = get_valid_coordinate("Sur quelle ligne se situe le penguin que vous voulez deplacer", rows);
-    int oldcols = get_valid_coordinate("Sur quelle colonne situe le penguin que vous voulez deplacer", cols);
-    int newrows = get_valid_coordinate("Sur quelle ligne voulez vous deplacer votre penguin", rows);
-    int newcols = get_valid_coordinate("Sur quelle colonne voulez vous deplacer votre penguin", cols);
-
-    // Clear the old penguin's position
-    int posxx, posyy;
-    if (oldcols % 2 == 0) {
-        posxx = 5 + (oldcols * 8);
-        posyy = 4 + (oldrows * 4);
-    } else {
-        posxx = 13 + ((oldcols - 1) * 8);
-        posyy = 6 + ((oldrows - 1) * 4);
+    printf("\x1B[K");
+    printf("sur quelle colonne situe le penguin que voulez vous deplacer ?\n");
+    scanf("%d",&oldcols);
+    printf("\x1B[F\x1B[K");
+    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
+    if(board[oldrows][oldcols].penguin==0){
+        printf("\x1B[4F");
     }
-    printf("\x1B[%d;%dH   ", posyy, posxx); // Clear the old penguin's position
+    }while (board[oldrows][oldcols].penguin==0);
+    board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
+    board[oldrows][oldcols].broken =1;
+    
+    
+    do{
+	    do{
+	    printf("\x1B[K");
+	    printf("sur quelle ligne voulez vous deplacer votre penguin ?\n"); 
+	    scanf("%d",&newrows);
+	    printf("\x1B[F\x1B[K");
+	    printf("\x1B[E"); 
+	    if (newrows > rows-1 || newrows < 0) {
+		printf("\x1B[2F");
+	       	   
+	    }   
+	    }while (newrows > rows-1 || newrows < 0);
+	    
+	    do{
+	    printf("\x1B[K");
+	    printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
+	    scanf("%d",&newcols);
+	    printf("\x1B[F\x1B[K");
+	    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
+	    if (newcols > cols-1 || newcols < 0 ) {
+		printf("\x1B[2F");
+	       	   
+	    } 
+	    }while (newcols > cols-1 || newcols < 0);
+        if(board[newrows][newcols].penguin ==1 || board[newrows][newcols].broken ==1 ){
+		printf("\x1B[4F");       
+        }
+    }while (board[newrows][newcols].penguin ==1 || (newrows==0 && newcols%2!=0) || board[newrows][newcols].broken ==1 ); // verif qu'il n'y a pas déja un pingouin
+    
+    board[newrows][newcols].penguin =1;// met un pingouin sur la nouvelle case
+    
+    if(oldcols%2==0){
+        int posxx= (5+(oldcols*8));
+        int posyy= (4+(oldrows*4));  
+	printf("\x1B[%d;%dH",posyy-2,posxx-2);
+	printf("🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy-1,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy+1,posxx-2);
+	printf("🌊🌊🌊");
 
-    // Place the new penguin at the new location
-    int posx, posy;
-    if (newcols % 2 == 0) {
-        posx = 5 + (newcols * 8);
-        posy = 4 + (newrows * 4);
-    } else {
-        posx = 13 + ((newcols - 1) * 8);
-        posy = 6 + ((newrows - 1) * 4);
     }
-    printf("\x1B[%d;%dH🐧", posy, posx); // Place the penguin at the new location
 
-    printf("\x1B[0;0H"); // Reset cursor position
+    else{
+            oldcols = oldcols-1;
+        int posxx= (13+(oldcols*8));
+        int posyy= (6+((oldrows-1)*4));
+        printf("\x1B[%d;%dH",posyy-2,posxx-2);
+	printf("🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy-1,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy+1,posxx-2);
+	printf("🌊🌊🌊");
+	
+	
+    }
+    
+    if(newcols%2==0){
+        int posx= (5+(newcols*8));
+        int posy= (4+(newrows*4));
+        printf("\x1B[%d;%dH🐧",posy,posx);
+
+    }
+
+    else{
+        newcols = newcols-1;
+        int posx= 13+(newcols*8);
+        int posy= 6+((newrows-1)*4);
+        printf("\x1B[%d;%dH🐧",posy,posx);
+
+    }
+        printboard(board,rows,cols);
 }
+    
 
 
     
-void affichePenguin(Cell** board, int rows, int cols) {
-    srand(time(NULL)); // Initialize random number generator for different outcomes each run
-	for(int i=0;i<12;i++){
-      	    int newrows =rand() % rows-1 + 1;;
-	    int newcols =rand() % cols-1 + 1;;
-	   
-	   if (newrows ==0){
-	   newrows+=1;
-	   }
-	    if(newcols%2==0){
-		int posx= 5+(newcols*8);
-		int posy= 4+(newrows*4);
-		printf("\x1B[%d;%dH🐧",posy,posx);
-		
-	    }
-	    
-	    else{
-	    	newcols = newcols-1;
-		int posx= 13+(newcols*8);
-		int posy= 6+((newrows-1)*4);
-		printf("\x1B[%d;%dH🐧",posy,posx);
-        
-    		}
-    }
-}
+    
 
-
-int better_scan(const char *prompt) {
-    char input[100];  // Buffer to hold input
-    int value, ret_var;
-
-    while (1) {
-        printf("%s", prompt);
-        if (!fgets(input, sizeof(input), stdin)) {
-            continue;  // If input fails, prompt again
-        }
-
-        // Try to convert the string to an integer
-        ret_var = sscanf(input, "%d", &value);
-        
-        // Check for valid number range and correct conversion
-        if (ret_var == 1 && value >= 2 && value <= 6) {
-            return value;  // Return the value if it's a valid number
-        }
-        
-        printf("Type in a valid number between 2 and 6.\n");
-    }
-} // fgets and sscanf will avoid a loop once the user types in a character or an invalid number.
 
 
 int main() {
@@ -405,17 +430,15 @@ int main() {
     int num_players;
     
     system("clear");
-    num_players = better_scan("Enter the number of players (2 to 6): ");
-
-    if (num_players < 2 || num_players > 6) {
-        printf("Number of players must be between 2 and 6.\n");
-        exit(EXIT_FAILURE);
-    }
+    do {
+        printf("Enter the number of players (2 to 6): ");
+        scanf("%d", &num_players);
+    } while (num_players < 2 || num_players > 6);
 
     players = malloc(sizeof(Player) * num_players);
     if (players == NULL) {
-        printf("Error allocating memory for players\n");
-        exit(EXIT_FAILURE);
+        printf("Erreur malloc joueur\n");
+        exit(1);
     }
     
     setupPlayers(players, num_players);
@@ -428,7 +451,7 @@ int main() {
     if (cols%2==0){
     cols +=1;
     }
-    
+   
 
     // Vérification de la validité de la taille du plateau de jeu
     if (rows < 1 || cols < 1 || rows > MAX_ROWS || cols > MAX_COLS) {
@@ -441,9 +464,9 @@ int main() {
     
     // Affichage de la zone de jeu
     printGameBoard(board,rows, cols, players, num_players);
-    affichePenguin(board, rows, cols);
+    
     for(int i=0;i<10;i++){
-    movepenguin(rows, cols);
+    movepenguin(board,rows, cols);
     printf("\x1B[20;1H");
     }
    
