@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <string.h>
+#include <limits.h>
 
 #define MAX_ROWS 9
 #define MAX_COLS 9
@@ -25,22 +26,6 @@ void clear_input_buffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {}
 }
-
-int get_valid_coordinate(const char *prompt, int max_value) {
-    int value;
-    char input[100];
-    while (1) {
-        printf("%s (0 to %d): ", prompt, max_value - 1);
-        if (fgets(input, sizeof(input), stdin) == NULL) {
-            continue;  // Handle possible I/O issues
-        }
-        if (sscanf(input, "%d", &value) == 1 && value >= 0 && value <= max_value - 1) {
-            return value;
-        }
-        printf("Invalid input. Please enter a valid number between 0 and %d.\n", max_value - 1);
-    }
-}
-
 
 void setupPlayers(Player* players, int num_players) {
     for (int i = 0; i < num_players; i++) {
@@ -325,7 +310,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     printf("\n");
 }
 
-void movepenguin(Cell** board,int rows, int cols){
+/*void movepenguin(Cell** board,int rows, int cols){
     printf("\x1B[30;1H");
     int oldrows =0;
     int oldcols =0;
@@ -414,6 +399,102 @@ void movepenguin(Cell** board,int rows, int cols){
 
     }
         printboard(board,rows,cols);
+} */
+
+void movepenguin(Cell** board, int rows, int cols) {
+    int oldrows = 0, oldcols = 0, newrows = 0, newcols = 0;
+    int valid = 0;  // Flag to check for valid input
+    char buffer[100];  // Buffer for input
+
+    do {
+        printf("On which row is the penguin you want to move? ");
+        if (fgets(buffer, sizeof(buffer), stdin) && sscanf(buffer, "%d", &oldrows) == 1) {
+            if (oldrows >= 0 && oldrows < rows && board[oldrows][oldcols].penguin == 1) {
+                valid = 1;
+            } else {
+                printf("Invalid row or no penguin at this position, please try again.\n");
+            }
+        } else {
+            printf("Invalid input, please enter a number.\n");
+            clear_input_buffer();  // Clear input buffer
+        }
+    } while (!valid);
+
+    valid = 0;  // Reset flag for column input
+    do {
+        printf("On which column is the penguin you want to move? ");
+        if (fgets(buffer, sizeof(buffer), stdin) && sscanf(buffer, "%d", &oldcols) == 1) {
+            if (oldcols >= 0 && oldcols < cols && board[oldrows][oldcols].penguin == 1) {
+                valid = 1;
+            } else {
+                printf("Invalid column or no penguin at this position, please try again.\n");
+            }
+        } else {
+            printf("Invalid input, please enter a number.\n");
+            clear_input_buffer();  // Clear input buffer
+        }
+    } while (!valid);
+
+    board[oldrows][oldcols].penguin = 0;
+    board[oldrows][oldcols].broken = 1;
+
+    valid = 0;  // Reset for new position
+    do {
+        printf("To which row do you want to move your penguin? ");
+        if (fgets(buffer, sizeof(buffer), stdin) && sscanf(buffer, "%d", &newrows) == 1) {
+            if (newrows >= 0 && newrows < rows && board[newrows][newcols].penguin == 0 && !(newrows == 0 && newcols % 2 != 0)) {
+                valid = 1;
+            } else {
+                printf("Invalid position or position already occupied, please try again.\n");
+            }
+        } else {
+            printf("Invalid input, please enter a number.\n");
+            clear_input_buffer();  // Clear input buffer
+        }
+    } while (!valid);
+
+    valid = 0;  // Reset for column
+    do {
+        printf("To which column do you want to move your penguin? ");
+        if (fgets(buffer, sizeof(buffer), stdin) && sscanf(buffer, "%d", &newcols) == 1) {
+            if (newcols >= 0 && newcols < cols && board[newrows][newcols].penguin == 0 && !(newrows == 0 && newcols % 2 != 0)) {
+                valid = 1;
+            } else {
+                printf("Invalid position or position already occupied, please try again.\n");
+            }
+        } else {
+            printf("Invalid input, please enter a number.\n");
+            clear_input_buffer();  // Clear input buffer
+        }
+    } while (!valid);
+
+    board[newrows][newcols].penguin = 1;  // Move penguin to the new position
+
+    // Clear previous position
+    if (oldcols % 2 == 0) {
+        int posx = 5 + (oldcols * 8);
+        int posy = 4 + (oldrows * 4);
+        printf("\x1B[%d;%dH ", posy, posx);
+    } else {
+        oldcols -= 1;
+        int posx = 13 + (oldcols * 8);
+        int posy = 6 + ((oldrows - 1) * 4);
+        printf("\x1B[%d;%dH ", posy, posx);
+    }
+
+    // Display new position with penguin
+    if (newcols % 2 == 0) {
+        int posx = 5 + (newcols * 8);
+        int posy = 4 + (newrows * 4);
+        printf("\x1B[%d;%dH🐧", posy, posx);
+    } else {
+        newcols -= 1;
+        int posx = 13 + (newcols * 8);
+        int posy = 6 + ((newrows - 1) * 4);
+        printf("\x1B[%d;%dH🐧", posy, posx);
+    }
+    
+    printboard(board, rows, cols);  // Refresh the board display
 }
     
 
