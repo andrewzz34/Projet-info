@@ -304,13 +304,15 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     printf("\n");
 }
 
-void movepenguin(int rows, int cols){
+void movepenguin(Cell** board,int rows, int cols){
     printf("\x1B[30;1H");
     int oldrows =0;
     int oldcols =0;
     int newrows =0;
     int newcols =0;
     
+    do{
+     
     printf("\x1B[K");
     printf("sur quelle ligne se situe le penguin que voulez vous deplacer ?\n");
     scanf("%d",&oldrows);
@@ -322,28 +324,42 @@ void movepenguin(int rows, int cols){
     scanf("%d",&oldcols);
     printf("\x1B[F\x1B[K");
     printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
-   
-   
+    if(board[oldrows][oldcols].penguin==0){
+        printf("\x1B[4F");
+    }
+    }while (board[oldrows][oldcols].penguin==0);
+    board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
+    board[oldrows][oldcols].broken =1;
     do{
-    printf("\x1B[K");
-    printf("sur quelle ligne voulez vous deplacer votre penguin ?\n"); 
-    scanf("%d",&newrows);
-    printf("\x1B[F\x1B[K");
-    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
-    if (newrows > rows || newrows < 0) {
-        printf("\x1B[2F");
-       	   
-    }   
-    }while (newrows > rows || newrows < 0);
+	    do{
+	    printf("\x1B[K");
+	    printf("sur quelle ligne voulez vous deplacer votre penguin ?\n"); 
+	    scanf("%d",&newrows);
+	    printf("\x1B[F\x1B[K");
+	    printf("\x1B[E"); 
+	    if (newrows > rows-1 || newrows < 0) {
+		printf("\x1B[2F");
+	       	   
+	    }   
+	    }while (newrows > rows-1 || newrows < 0);
+	    
+	    do{
+	    printf("\x1B[K");
+	    printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
+	    scanf("%d",&newcols);
+	    printf("\x1B[F\x1B[K");
+	    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
+	    if (newcols > cols-1 || newcols < 0 ) {
+		printf("\x1B[2F");
+	       	   
+	    } 
+	    }while (newcols > cols-1 || newcols < 0);
+        if(board[newrows][newcols].penguin ==1){
+		printf("\x1B[4F");       
+        }
+    }while (board[newrows][newcols].penguin ==1 || (newrows==0 && newcols%2!=0)); // verif qu'il n'y a pas déja un pingouin
     
-    
-    printf("\x1B[K");
-    printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
-    scanf("%d",&newcols);
-    printf("\x1B[F\x1B[K");
-    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
-
-
+    board[newrows][newcols].penguin =1;// met un pingouin sur la nouvelle case
     
     if(oldcols%2==0){
         int posxx= (5+(oldcols*8));
@@ -376,6 +392,7 @@ void movepenguin(int rows, int cols){
         printf("\x1B[%d;%dH🐧",posy,posx);
 
     }
+        printboard(board,rows,cols);
 }
     
 
@@ -432,7 +449,7 @@ int main() {
     printGameBoard(board,rows, cols, players, num_players);
     
     for(int i=0;i<10;i++){
-    movepenguin(rows, cols);
+    movepenguin(board,rows, cols);
     printf("\x1B[20;1H");
     }
    
