@@ -444,7 +444,8 @@ void movepenguin(Cell** board,int rows, int cols){
     int oldcols =0;
     int newrows =0;
     int newcols =0;
-    
+    int player_index;
+
     do{
      
     printf("\x1B[K");
