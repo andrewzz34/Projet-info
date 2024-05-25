@@ -274,7 +274,7 @@ void affichePenguin(Cell** board, int rows, int cols) {
 //case en haut ///////////////////////////////////////////////////////////////////
 int verifyT(Cell **board, int crows, int ccols, int rows, int cols){
   //case en haut 
-  if ((board[crows][ccols + 1].penguin =0 && board[crows][ccols + 1].broken == 0)) {
+  if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
       return 1;
   } 
   else {
@@ -286,7 +286,7 @@ int verifyT(Cell **board, int crows, int ccols, int rows, int cols){
 //case en bas///////////////////////////////////////////////////////////////////
 int verifyL(Cell **board, int crows, int ccols, int rows, int cols){
   //case en bas
-  if ((board[crows + 1][ccols].penguin = 0 && board[crows + 1][ccols].broken == 0)) {
+  if ((board[crows + 1][ccols].penguin ==0 && board[crows + 1][ccols].broken == 0)) {
       return 1;
   } 
   else {
@@ -298,7 +298,7 @@ int verifyL(Cell **board, int crows, int ccols, int rows, int cols){
 int verifyTR(Cell **board, int crows, int ccols, int rows, int cols){
   //case en haut a droite colonnes paire
   if(ccols%2==0){
-       if ((board[crows][ccols + 1].penguin =0 && board[crows][ccols + 1].broken == 0)) {
+       if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
          return 1;
        } 
        else {
@@ -309,7 +309,7 @@ int verifyTR(Cell **board, int crows, int ccols, int rows, int cols){
   else{
     //case en haut a droite colonnes impaire
 
-     if ((board[crows-1][ccols + 1].penguin =0 && board[crows][ccols + 1].broken == 0)) {
+     if ((board[crows-1][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
        return 1;
      } 
      else {
@@ -325,7 +325,7 @@ int verifyLR(Cell **board, int crows, int ccols, int rows, int cols){
   //case en bas à droite colonnes paire
   if(ccols%2==0){
 
-    if ((board[crows+1][ccols + 1].penguin =0 && board[crows+1][ccols + 1].broken == 0)) {
+    if ((board[crows+1][ccols + 1].penguin ==0 && board[crows+1][ccols + 1].broken == 0)) {
         return 1;
     } else {
         return 0;
@@ -334,7 +334,7 @@ int verifyLR(Cell **board, int crows, int ccols, int rows, int cols){
     //case en bas à droite colonnes impaire
 
   else{
-    if ((board[crows][ccols + 1].penguin =0 && board[crows][ccols + 1].broken == 0)) {
+    if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
       return 1;
     } 
     else {
@@ -349,7 +349,7 @@ int verifyLR(Cell **board, int crows, int ccols, int rows, int cols){
 int verifyLL(Cell **board, int crows, int ccols, int rows, int cols){
     if(ccols%2==0){
 
-      if ((board[crows+1][ccols - 1].penguin =0 && board[crows+1][ccols - 1].broken == 0)) {
+      if ((board[crows+1][ccols - 1].penguin ==0 && board[crows+1][ccols - 1].broken == 0)) {
           return 1;
       } 
       else {
@@ -359,7 +359,7 @@ int verifyLL(Cell **board, int crows, int ccols, int rows, int cols){
       //case en bas à gauche colonnes impaire
 
     else{
-      if ((board[crows][ccols - 1].penguin =0 && board[crows][ccols - 1].broken == 0)) {
+      if ((board[crows][ccols - 1].penguin ==0 && board[crows][ccols - 1].broken == 0)) {
         return 1;
       } 
       else {
@@ -373,7 +373,7 @@ int verifyLL(Cell **board, int crows, int ccols, int rows, int cols){
 int verifyTL(Cell **board, int crows, int ccols, int rows, int cols){
   if(ccols%2==0){
 
-    if ((board[crows][ccols - 1].penguin =0 && board[crows][ccols - 1].broken == 0)) {
+    if ((board[crows][ccols - 1].penguin ==0 && board[crows][ccols - 1].broken == 0)) {
       return 1;
     } 
     else {
@@ -383,7 +383,7 @@ int verifyTL(Cell **board, int crows, int ccols, int rows, int cols){
         //case en bas à droite colonnes impaire
 
   else{
-        if ((board[crows- 1][ccols - 1].penguin =0 && board[crows- 1][ccols - 1].broken == 0)) {
+        if ((board[crows- 1][ccols - 1].penguin ==0 && board[crows- 1][ccols - 1].broken == 0)) {
           return 1;
         } 
         else {
@@ -569,7 +569,9 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     }
     affichePenguin(board, rows, cols);
     printfishes(board,rows,cols);
-    printf("\x1B[4;120H       👑");
+    int mv=possiblemove(board, 3, 3, rows, cols);
+    printf("\x1B[10;135H%d",mv);
+    printf("\x1B[4;130H       👑");
     printf("\x1B[5;130H Bob : ");
     printf("\x1B[5;137H\x1B[48;2;255;128;0m🐧\x1B[0m");
 
@@ -744,8 +746,7 @@ int main() {
     printf("\x1B[20;1H");
     }
    
-    int mv=possiblemove(board, 3, 3, rows, cols);
-    printf("\x1B[30;135H%d",mv);
+    
     int a = (4 * rows) + 10;
     printf("\x1B[%d;0H\n", a);
     
