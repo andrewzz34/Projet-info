@@ -229,47 +229,43 @@ void printfishes(Cell** board,int rows, int cols){
   }
 
 }
-void placePenguinsBasedOnPlayers(Cell** board, int rows, int cols, Player* players, int num_players) {
-    srand(time(NULL)); // Initialize random number generator
+void affichePenguin(Cell** board, int rows, int cols, int num_players) {
+    srand(time(NULL)); // Initialize random number generator for different outcomes each run
 
     int penguins_per_player;
     if (num_players == 2) {
         penguins_per_player = 4;
     } else if (num_players == 3) {
         penguins_per_player = 3;
-    } else if (num_players == 4) {
+    } else if (num_players >= 4) {
         penguins_per_player = 2;
-    } else {
-        penguins_per_player = 1;
     }
 
     int total_penguins = num_players * penguins_per_player;
-    int placed_penguins = 0;
+    for (int i = 0; i < total_penguins; i++) {
+        int newrows, newcols;
+        do {
+            newrows = rand() % rows;
+            newcols = rand() % cols;
+        } while (board[newrows][newcols].penguin != 0 || (newrows == 0 && newcols % 2 != 0) || board[newrows][newcols].broken == 1);
 
-    while (placed_penguins < total_penguins) {
-        for (int i = 0; i < num_players && placed_penguins < total_penguins; i++) {
-            int row, col;
-            do {
-                row = rand() % rows;
-                col = rand() % cols;
+       if (newcols % 2 == 0) {
+    posx = 5 + (newcols * 8);
+} else {
+    posx = 13 + ((newcols - 1) * 8);
+}
 
-                // Ensure penguins are placed on valid, unoccupied cells
-            } while (board[row][col].penguin != 0 || (row == 0 && col % 2 != 0) || board[row][col].broken == 1);
-
-            // Place a penguin linked to the current player
-            board[row][col].penguin = i + 1; // Player ID starts from 1 to num_players
-            board[row][col].playeron = i + 1; // Reflect the player ID on the cell
-
-            // Displaying the penguin on the board (You might need to adjust this part depending on your board printing logic)
-            int display_row = 4 * row + 3; // Calculate the exact display row
-            int display_col = col % 2 == 0 ? (5 + (col * 8)) : (13 + ((col - 1) * 8)); // Calculate the exact display column based on whether the column is odd or even
-            printf("\x1B[%d;%dH🐧", display_row, display_col);
-
-            placed_penguins++;
-        }
+// Calculate posy
+if (newcols % 2 == 0) {
+    posy = 4 + (newrows * 4);
+} else {
+    posy = 6 + ((newrows - 1) * 4);
+}
+        printf("\x1B[%d;%dH🐧", posy, posx);
+        board[newrows][newcols].penguin = 1;
+        board[newrows][newcols].fishes = 1;
     }
-
-    printboard(board, rows, cols); // Update the board display after placing all penguins
+    printboard(board, rows, cols);
 }
 
 
@@ -295,7 +291,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     for (int i = 0; i < rows; i++) {
         printHexagonLine(cols);
     }
-    placePenguinsBasedOnPlayers(board, rows, cols, players, num_players);
+    affichePenguin(board, rows, cols, num_players);
     printfishes(board,rows,cols);
     printf("\x1B[4;120H       👑");
     printf("\x1B[5;130H Bob : ");
