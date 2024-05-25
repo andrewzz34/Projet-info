@@ -12,13 +12,15 @@
 typedef struct {
     char player_name[PLAYER_NAME_BUFFER];
     int score;
-    int penguins; 
+    int penguins;
+    int id_player; 
 } Player;
 
 typedef struct {
     int fishes; // Nombre de poissons sur la case
     int penguin; // Identifiant du pingouin sur la case, 0 si aucun
     int broken; // Indique si la case est occupée (1 pour oui, 0 pour non)
+    int playeron;
 } Cell;
 
 void setupPlayers(Player* players, int num_players) {
@@ -78,7 +80,7 @@ void printboard(Cell** board,int rows, int cols){
         for (int j = 0; j < cols; j++) {
          	int k=(j+(i*9))+1;
          	printf("\x1B[%d;80H",k);	
-            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, occupied=%d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken);
+            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, broken=%d, Player on is %d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken, board[i][j].playeron);
         }
     }
 }
@@ -101,21 +103,24 @@ Cell** initializeBoard(int rows, int cols) {
             board[i][j].fishes = 0;
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
+            board[i][j].playeron = 0;
             }
             else if(luck==1) {
             board[i][j].fishes = rand() % 3 + 1; // Entre 1 et 3 poissons
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
+            board[i][j].playeron = 0;
             }
             else{
             board[i][j].fishes = rand() % 2 + 2; // Entre 2 et 3 poissons
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
+            board[i][j].playeron = 0;
             }
         }
     }
   
-    //printf("\x1B[1;1H");
+
     printboard(board,rows,cols);// a titre vérificatif
 
     // Retourner le pointeur vers le tableau
@@ -291,8 +296,8 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     affichePenguin(board, rows, cols);
     printfishes(board,rows,cols);
     printf("\x1B[4;120H       👑");
-    printf("\x1B[5;120H Bob : ");
-    printf("\x1B[5;127H\x1B[48;2;255;128;0m🐧\x1B[0m");
+    printf("\x1B[5;130H Bob : ");
+    printf("\x1B[5;137H\x1B[48;2;255;128;0m🐧\x1B[0m");
 
     // Affichage des noms et scores des joueurs
     printf("\x1B[%d;0H\n", a);
@@ -363,9 +368,15 @@ void movepenguin(Cell** board,int rows, int cols){
     
     if(oldcols%2==0){
         int posxx= (5+(oldcols*8));
-        int posyy= (4+(oldrows*4));
-        printf("\x1B[%d;%dH",posyy,posxx);
-	printf(" ");
+        int posyy= (4+(oldrows*4));  
+	printf("\x1B[%d;%dH",posyy-2,posxx-2);
+	printf("🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy-1,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy+1,posxx-2);
+	printf("🌊🌊🌊");
 
     }
 
@@ -373,9 +384,16 @@ void movepenguin(Cell** board,int rows, int cols){
             oldcols = oldcols-1;
         int posxx= (13+(oldcols*8));
         int posyy= (6+((oldrows-1)*4));
-        printf("\x1B[%d;%dH",posyy,posxx);
-        printf(" ");
-
+        printf("\x1B[%d;%dH",posyy-2,posxx-2);
+	printf("🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy-1,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy+1,posxx-2);
+	printf("🌊🌊🌊");
+	
+	
     }
     
     if(newcols%2==0){
