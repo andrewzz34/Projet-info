@@ -229,46 +229,6 @@ void printfishes(Cell** board,int rows, int cols){
   }
 
 }
-/*void affichePenguin(Cell** board, int rows, int cols, int num_players) {
-    srand(time(NULL)); // Initialize random number generator for different outcomes each run
-int posx;
-int posy;
-    int penguins_per_player;
-    if (num_players == 2) {
-        penguins_per_player = 4;
-    } else if (num_players == 3) {
-        penguins_per_player = 3;
-    } else if (num_players >= 4) {
-        penguins_per_player = 2;
-    }
-
-    int total_penguins = num_players * penguins_per_player;
-    for (int i = 0; i < total_penguins; i++) {
-        int newrows, newcols;
-        do {
-            newrows = rand() % rows;
-            newcols = rand() % cols;
-        } while (board[newrows][newcols].penguin != 0 || (newrows == 0 && newcols % 2 != 0) || board[newrows][newcols].broken == 1);
-
-       if (newcols % 2 == 0) {
-    posx = 5 + (newcols * 8);
-} else {
-    posx = 13 + ((newcols - 1) * 8);
-}
-
-// Calculate posy
-if (newcols % 2 == 0) {
-    posy = 4 + (newrows * 4);
-} else {
-    posy = 6 + ((newrows - 1) * 4);
-}
-        printf("\x1B[%d;%dH🐧", posy, posx);
-        board[newrows][newcols].penguin = 1;
-        board[newrows][newcols].fishes = 1;
-    }
-    printboard(board, rows, cols);
-}*/
-
 
 
 
