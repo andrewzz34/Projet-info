@@ -335,6 +335,8 @@ void movepenguin(Cell** board,int rows, int cols){
     }while (board[oldrows][oldcols].penguin==0);
     board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
     board[oldrows][oldcols].broken =1;
+    
+    
     do{
 	    do{
 	    printf("\x1B[K");
@@ -359,10 +361,10 @@ void movepenguin(Cell** board,int rows, int cols){
 	       	   
 	    } 
 	    }while (newcols > cols-1 || newcols < 0);
-        if(board[newrows][newcols].penguin ==1){
+        if(board[newrows][newcols].penguin ==1 || board[newrows][newcols].broken ==1 ){
 		printf("\x1B[4F");       
         }
-    }while (board[newrows][newcols].penguin ==1 || (newrows==0 && newcols%2!=0)); // verif qu'il n'y a pas déja un pingouin
+    }while (board[newrows][newcols].penguin ==1 || (newrows==0 && newcols%2!=0) || board[newrows][newcols].broken ==1 ); // verif qu'il n'y a pas déja un pingouin
     
     board[newrows][newcols].penguin =1;// met un pingouin sur la nouvelle case
     
@@ -447,12 +449,7 @@ int main() {
     if (cols%2==0){
     cols +=1;
     }
-    
-    
-  
-    
-    
-    
+   
 
     // Vérification de la validité de la taille du plateau de jeu
     if (rows < 1 || cols < 1 || rows > MAX_ROWS || cols > MAX_COLS) {
