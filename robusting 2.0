@@ -21,6 +21,27 @@ typedef struct {
     int broken; // Indique si la case est occupée (1 pour oui, 0 pour non)
 } Cell;
 
+void clear_input_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {}
+}
+
+int get_valid_coordinate(const char *prompt, int max_value) {
+    int value;
+    char input[100];
+    while (1) {
+        printf("%s (0 to %d): ", prompt, max_value - 1);
+        if (fgets(input, sizeof(input), stdin) == NULL) {
+            continue;  // Handle possible I/O issues
+        }
+        if (sscanf(input, "%d", &value) == 1 && value >= 0 && value <= max_value - 1) {
+            return value;
+        }
+        printf("Invalid input. Please enter a valid number between 0 and %d.\n", max_value - 1);
+    }
+}
+
+
 void setupPlayers(Player* players, int num_players) {
     for (int i = 0; i < num_players; i++) {
         printf("Enter name for player %d (up to 49 characters): ", i + 1);
