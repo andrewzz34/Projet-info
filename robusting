@@ -231,7 +231,8 @@ void printfishes(Cell** board,int rows, int cols){
 }
 void affichePenguin(Cell** board, int rows, int cols, int num_players) {
     srand(time(NULL)); // Initialize random number generator for different outcomes each run
-
+int posx;
+int posy;
     int penguins_per_player;
     if (num_players == 2) {
         penguins_per_player = 4;
