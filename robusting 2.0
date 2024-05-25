@@ -27,7 +27,7 @@ void clear_input_buffer() {
     while ((c = getchar()) != '\n' && c != EOF) {}
 }
 
-void setupPlayers(Player* players, int num_players) {
+/*void setupPlayers(Player* players, int num_players) {
     for (int i = 0; i < num_players; i++) {
         printf("Enter name for player %d (up to 49 characters): ", i + 1);
         scanf("%49s", players[i].player_name); // Limite l'entrée pour éviter le débordement de tampon
@@ -40,6 +40,38 @@ void setupPlayers(Player* players, int num_players) {
 
         players[i].score = 0;
 
+        if (num_players == 2) {
+            players[i].penguins = 4;
+        } else if (num_players == 3) {
+            players[i].penguins = 3;
+        } else {
+            players[i].penguins = 2;
+        }
+    }
+} */
+
+void setupPlayers(Player* players, int num_players) {
+    char buffer[PLAYER_NAME_BUFFER + 1]; // +1 for newline
+    for (int i = 0; i < num_players; i++) {
+        printf("Enter name for player %d (up to 49 characters): ", i + 1);
+        if (fgets(buffer, sizeof(buffer), stdin)) {
+            // Remove newline character if present
+            buffer[strcspn(buffer, "\n")] = 0;
+
+            // Check if input was too long
+            if (strlen(buffer) > MAX_NAME_LENGTH) {
+                printf("Name entered is too long. Please enter a name up to 49 characters.\n");
+                i--; // Decrement i to retry this player's name input
+                continue;
+            }
+            strcpy(players[i].player_name, buffer);
+        } else {
+            clear_input_buffer(); // Just in case fgets failed due to an error
+            printf("Input error. Please try again.\n");
+            i--; // Decrement i to retry input
+        }
+
+        players[i].score = 0;
         if (num_players == 2) {
             players[i].penguins = 4;
         } else if (num_players == 3) {
