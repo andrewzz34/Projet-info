@@ -466,7 +466,7 @@ int possiblemove(Cell **board, int crows, int ccols, int rows, int cols) {
       //lower cell
       posmove += verifyL(board, crows, ccols, rows, cols);
 
-      /left lower cell
+      //left lower cell
       posmove += verifyLL(board, crows, ccols, rows, cols);
 
     }
@@ -764,7 +764,6 @@ void movepenguin(Cell** board,int rows, int cols,char** colors){
 
 
 int main() {
-Printf("***********CY FISH***********\n");
     int rows, cols;
     Player* players = NULL;
     int num_players;
