@@ -59,8 +59,11 @@ void setupPlayers(Player* players, int num_players, char** colors) {
                 printf("Input error. Please try again.\n");
             }
         }
-
+        
         players[i].score = 0;
+        players[i].id_player = i;
+
+       
         if (num_players == 2) {
             players[i].penguins = 4;
         } else if (num_players == 3) {
