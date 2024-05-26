@@ -764,6 +764,7 @@ void movepenguin(Cell** board,int rows, int cols,char** colors){
 
 
 int main() {
+Printf("***********CY FISH***********\n");
     int rows, cols;
     Player* players = NULL;
     int num_players;
