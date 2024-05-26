@@ -874,6 +874,7 @@ void movepenguin(Cell** board,int rows, int cols){
 
 
 
+
 int main() {
     int rows, cols;
     Player* players = NULL;
