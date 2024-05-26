@@ -666,10 +666,8 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
 
 
 
-
-void movepenguin(Cell** board, int rows, int cols, Player* players, int num_players, int currentPlayer){ // char** colors){
+void movepenguin(Cell** board,int rows, int cols,char** colors){
     printf("\x1B[30;1H");
- printf("Player %d's turn (%s)\n", currentPlayer + 1, players[currentPlayer].player_name);
     int oldrows =0;
     int oldcols =0;
     int newrows =0;
@@ -689,11 +687,10 @@ void movepenguin(Cell** board, int rows, int cols, Player* players, int num_play
     scanf("%d",&oldcols);
     printf("\x1B[F\x1B[K");
     printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
-    if(board[oldrows][oldcols].penguin==0 && board[oldrows][oldcols].penguin - 1 != currentPlayer){
-printf("please select again.\n");
+    if(board[oldrows][oldcols].penguin==0){
         printf("\x1B[4F");
     }
-    }while (board[oldrows][oldcols].penguin==0 && board[oldrows][oldcols].penguin - 1 != currentPlayer);
+    }while (board[oldrows][oldcols].penguin==0);
  player_index = board[oldrows][oldcols].penguin - 1; 
     board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
     board[oldrows][oldcols].broken =1;
@@ -775,24 +772,6 @@ printf("please select again.\n");
     
 
 
-void gameLoop(Player* players, Cell** board, int rows, int cols, int num_players) {
-    int currentPlayer = 0;
-    int gameContinue = 1;
-
-    while (gameContinue) {
-        printGameBoard(board, rows, cols, players, num_players);
-        movepenguin(board, rows, cols, players, num_players, currentPlayer);
-
-        currentPlayer = (currentPlayer + 1) % num_players; // Move to the next player
-
-        // Condition to determine if the game should continue
-        // gameContinue = checkIfGameContinues(...);
-
-        if (!gameContinue) {
-            determineWinner(players, num_players);
-        }
-    }
-}
 
 
   int better_scan(const char *prompt) {
@@ -868,7 +847,7 @@ gameLoop(players, board, rows, cols, num_players);
     printGameBoard(board,rows, cols, players, num_players);
     
     for(int i=0;i<10;i++){
-    movepenguin(board, rows, cols, players, num_players, currentPlayer);
+    movepenguin(board, rows, cols, players);
     printf("\x1B[20;1H");
     }
    
