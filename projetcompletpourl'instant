@@ -617,7 +617,7 @@ void movepenguin(Cell** board,int rows, int cols,char** colors){
         printf("\x1B[4F");
     }
     }while (board[oldrows][oldcols].penguin==0);
-    player_index = board[oldrows][oldcols].penguin - 1; 
+    player_index = board[oldrows][oldcols].playeron -1 ; 
     board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
     board[oldrows][oldcols].broken =1;
     int playerID = board[oldrows][oldcols].playeron;
