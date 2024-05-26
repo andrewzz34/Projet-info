@@ -667,8 +667,9 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
 
 
 
-void movepenguin(Cell** board, int rows, int cols, Player* players, int num_players, int currentPlayer){
+void movepenguin(Cell** board, int rows, int cols, Player* players, int num_players, int currentPlayer){ // char** colors){
     printf("\x1B[30;1H");
+ printf("Player %d's turn (%s)\n", currentPlayer + 1, players[currentPlayer].player_name);
     int oldrows =0;
     int oldcols =0;
     int newrows =0;
@@ -688,15 +689,11 @@ void movepenguin(Cell** board, int rows, int cols, Player* players, int num_play
     scanf("%d",&oldcols);
     printf("\x1B[F\x1B[K");
     printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
-
-
-
- if (board[oldrows][oldcols].penguin - 1 != currentPlayer) {
-printf("\x1B[4F");
-            printf("You can only move your own penguins. Please select again.\n");
-        }
-    } while (board[oldrows][oldcols].penguin - 1 != currentPlayer);
-
+    if(board[oldrows][oldcols].penguin==0 && board[oldrows][oldcols].penguin - 1 != currentPlayer){
+printf("please select again.\n");
+        printf("\x1B[4F");
+    }
+    }while (board[oldrows][oldcols].penguin==0 && board[oldrows][oldcols].penguin - 1 != currentPlayer);
  player_index = board[oldrows][oldcols].penguin - 1; 
     board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
     board[oldrows][oldcols].broken =1;
@@ -730,19 +727,8 @@ printf("\x1B[4F");
 		printf("\x1B[4F");       
         }
     }while (board[newrows][newcols].penguin ==1 || (newrows==0 && newcols%2!=0) || board[newrows][newcols].broken ==1 ); // verif qu'il n'y a pas déja un pingouin
-
-board[oldrows][oldcols].penguin = 0;
-    board[oldrows][oldcols].broken = 1;
-
-    // New position setup (should validate new position inside moving logic)
-    board[newrows][newcols].penguin = currentPlayer + 1;
-
-
+    
     board[newrows][newcols].penguin =1;// met un pingouin sur la nouvelle case
-
-collectFishAndScore(board, players, newrows, newcols);
-
-   
     
     if(oldcols%2==0){
         int posxx= (5+(oldcols*8));
@@ -784,12 +770,9 @@ collectFishAndScore(board, players, newrows, newcols);
         int posy = 6 + ((newrows - 1) * 4);
         printf("\x1B[%d;%dH%s", posy, posx, colors[player_index]);
     }
- displayScoreboard(players, num_players);
-determineWinner(players, num_players);
         printboard(board,rows,cols);
 }
     
-
 
 
 void gameLoop(Player* players, Cell** board, int rows, int cols, int num_players) {
