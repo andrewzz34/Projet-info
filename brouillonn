@@ -901,6 +901,30 @@ void movepenguin(Cell** board,int rows, int cols){
 
 
 
+  int better_scan(const char *prompt) {
+    char input[100];  // Buffer to hold input
+    int value, ret_var;
+
+    while (1) {
+        printf("%s", prompt);
+        if (!fgets(input, sizeof(input), stdin)) {
+            continue;  // If input fails, prompt again
+        }
+
+        // Try to convert the string to an integer
+        ret_var = sscanf(input, "%d", &value);
+        
+        // Check for valid number range and correct conversion
+        if (ret_var == 1 && value >= 2 && value <= 6) {
+            return value;  // Return the value if it's a valid number
+        }
+        
+        printf("Type in a valid number between 2 and 6.\n");
+    }
+} // fgets and sscanf will avoid a loop once the user types in a character or an invalid number.
+    
+
+
 
 int main() {
     int rows, cols;
@@ -908,17 +932,20 @@ int main() {
     int num_players;
     
     system("clear");
-    do {
-        printf("Enter the number of players (2 to 6): ");
-        scanf("%d", &num_players);
-    } while (num_players < 2 || num_players > 6);
+    num_players = better_scan("Enter the number of players (2 to 6): ");
+
+    if (num_players < 2 || num_players > 6) {
+        printf("Number of players must be between 2 and 6.\n");
+        exit(EXIT_FAILURE);
+    }
 
     players = malloc(sizeof(Player) * num_players);
     if (players == NULL) {
-        printf("Erreur malloc joueur\n");
-        exit(1);
+        printf("Error allocating memory for players\n");
+        exit(EXIT_FAILURE);
     }
     
+  
     setupPlayers(players, num_players);
     
     // Fixation de la taille du plateau de jeu
