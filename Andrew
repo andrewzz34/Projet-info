@@ -17,16 +17,16 @@ typedef struct {
 } Player;
 
 typedef struct {
-    int fishes; // Nombre de poissons sur la case
-    int penguin; // Identifiant du pingouin sur la case, 0 si aucun
-    int broken; // Indique si la case est occupée (1 pour oui, 0 pour non)
+    int fishes; // Number of fish in cell
+    int penguin; // Penguin ID
+    int broken; // Check if case is occupied (1 for yes, 0 for no)
     int playeron;
 } Cell;
 
 void clear_input_buffer() {
     int c;
     while ((c = getchar()) != '\n' && c != EOF) {
-        // Discard the character
+        
     }
 }
 
@@ -116,15 +116,15 @@ void printboard(Cell** board,int rows, int cols){
 
 
 Cell** initializeBoard(int rows, int cols) {
-    srand(time(NULL)); // initialisation de rand()
+    srand(time(NULL)); 
     
-    // Allouer dynamiquement le tableau sur le tas
+    
     Cell** board = (Cell**)malloc(rows * sizeof(Cell*));
     for (int i = 0; i < rows; i++) {
         board[i] = (Cell*)malloc(cols * sizeof(Cell));
     }
 
-    // Initialiser toutes les cellules avec des poissons aléatoires entre 1 et 3
+    // initialize cell with fish from 1 to 3
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
             int luck= rand() % 2 + 1;	
@@ -135,13 +135,13 @@ Cell** initializeBoard(int rows, int cols) {
             board[i][j].playeron = 0;
             }
             else if(luck==1) {
-            board[i][j].fishes = rand() % 3 + 1; // Entre 1 et 3 poissons
+            board[i][j].fishes = rand() % 3 + 1; // between 1 and 3 fish
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
             board[i][j].playeron = 0;
             }
             else{
-            board[i][j].fishes = rand() % 2 + 2; // Entre 2 et 3 poissons
+            board[i][j].fishes = rand() % 2 + 2; // between 2 or 3 fish
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
             board[i][j].playeron = 0;
@@ -150,13 +150,12 @@ Cell** initializeBoard(int rows, int cols) {
     }
   
 
-    printboard(board,rows,cols);// a titre vérificatif
+    printboard(board,rows,cols);
 
-    // Retourner le pointeur vers le tableau
     return board;
 }
 
-// Fonction de libération de la mémoire allouée
+// Function to release allocated memory
 void freeBoard(Cell** board, int rows) {
     for (int i = 0; i < rows; i++) {
         free(board[i]);
@@ -308,9 +307,9 @@ void affichePenguin(Cell** board, int rows, int cols, int num_players, char** co
 
 
 
-//case en haut ///////////////////////////////////////////////////////////////////
+//upper cell///////////////////////////////////////////////////////////////////
 int verifyT(Cell **board, int crows, int ccols, int rows, int cols){
-  //case en haut 
+  //upper cell
   if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
       return 1;
   } 
@@ -320,9 +319,9 @@ int verifyT(Cell **board, int crows, int ccols, int rows, int cols){
 
 }
 
-//case en bas///////////////////////////////////////////////////////////////////
+//lower cell///////////////////////////////////////////////////////////////////
 int verifyL(Cell **board, int crows, int ccols, int rows, int cols){
-  //case en bas
+  //lower cell
   if ((board[crows + 1][ccols].penguin ==0 && board[crows + 1][ccols].broken == 0)) {
       return 1;
   } 
@@ -330,10 +329,10 @@ int verifyL(Cell **board, int crows, int ccols, int rows, int cols){
       return 0;
   }
 }
-//case en haut a droite///////////////////////////////////////////////////////////////////
+//right upper cell///////////////////////////////////////////////////////////////////
 
 int verifyTR(Cell **board, int crows, int ccols, int rows, int cols){
-  //case en haut a droite colonnes paire
+  //right upper cell even col
   if(ccols%2==0){
        if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
          return 1;
@@ -344,7 +343,7 @@ int verifyTR(Cell **board, int crows, int ccols, int rows, int cols){
      }
 
   else{
-    //case en haut a droite colonnes impaire
+    //right upper cell odd col
 
      if ((board[crows-1][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
        return 1;
@@ -356,10 +355,10 @@ int verifyTR(Cell **board, int crows, int ccols, int rows, int cols){
 }
 
 
-//case en bas a droite///////////////////////////////////////////////////////////////////
+//right lower cell///////////////////////////////////////////////////////////////////
 
 int verifyLR(Cell **board, int crows, int ccols, int rows, int cols){
-  //case en bas à droite colonnes paire
+  //right lower case even cols
   if(ccols%2==0){
 
     if ((board[crows+1][ccols + 1].penguin ==0 && board[crows+1][ccols + 1].broken == 0)) {
@@ -368,7 +367,7 @@ int verifyLR(Cell **board, int crows, int ccols, int rows, int cols){
         return 0;
     }
   }
-    //case en bas à droite colonnes impaire
+    //right lower cell even cols
 
   else{
     if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
@@ -381,7 +380,7 @@ int verifyLR(Cell **board, int crows, int ccols, int rows, int cols){
  
 }
 
-//case en bas a gauche///////////////////////////////////////////////////////////////////
+//left lower cell///////////////////////////////////////////////////////////////////
 
 int verifyLL(Cell **board, int crows, int ccols, int rows, int cols){
     if(ccols%2==0){
@@ -393,7 +392,7 @@ int verifyLL(Cell **board, int crows, int ccols, int rows, int cols){
           return 0;
       }
     }
-      //case en bas à gauche colonnes impaire
+      //left lower cell odd col
 
     else{
       if ((board[crows][ccols - 1].penguin ==0 && board[crows][ccols - 1].broken == 0)) {
@@ -417,7 +416,7 @@ int verifyTL(Cell **board, int crows, int ccols, int rows, int cols){
       return 0;
     }
   }
-        //case en bas à droite colonnes impaire
+        //right lower cell odd col
 
   else{
         if ((board[crows- 1][ccols - 1].penguin ==0 && board[crows- 1][ccols - 1].broken == 0)) {
@@ -433,23 +432,23 @@ int verifyTL(Cell **board, int crows, int ccols, int rows, int cols){
 
 
 int possiblemove(Cell **board, int crows, int ccols, int rows, int cols) {
-  ///// Cette fonction sert à compter le nombre de directions possibles d'un joueurs, je me suis rendu
-  //compte apres 180 lignes qu'il aurait été plus judicieux de faires 6 autres fonctions du style verif en 
-  //haut a gauche, en haut a droite, en bas a gauche voila...
+//this function is used to count the number of directions possible for a player, 
+//but i realized after 180 lines of code that it was smarter to create 6 other functions like "verif right left.."
+  
 
   int posmove = 0;
-  // cas de la première ligne/////////////////////////////////////////////////////////
+  // first line /////////////////////////////////////////////////////////
   if (crows == 0) { 
-    // cas de la première colonne de la première ligne
+    // first col of the first row 
     if (ccols == 0) {
-      //case en bas à droite
+      //right lower cell
       posmove += verifyLR(board, crows, ccols, rows, cols);
-      // case en dessous
+      // under
       posmove += verifyL(board, crows, ccols, rows, cols);
 
     }
 
-    //cases entre la première et la dernière colonne
+    //cell between the first and last col
     else if (ccols % 2 == 0 && ccols != 0 && ccols!=cols-1) {
       //case en bas a droite
       posmove += verifyLR(board, crows, ccols, rows, cols);
@@ -461,13 +460,13 @@ int possiblemove(Cell **board, int crows, int ccols, int rows, int cols) {
       posmove += verifyLL(board, crows, ccols, rows, cols);
 
     } 
-    // cas première ligne dernière colonne
+    // first row last col
 
     else {
-      //case en dessous
+      //lower cell
       posmove += verifyL(board, crows, ccols, rows, cols);
 
-      //case en bas a gauche
+      /left lower cell
       posmove += verifyLL(board, crows, ccols, rows, cols);
 
     }
@@ -475,106 +474,106 @@ int possiblemove(Cell **board, int crows, int ccols, int rows, int cols) {
 
     
 
-  ///cas de la dernière ligne//////////////////////////////////////////////////////////////////////////
+  ///last row//////////////////////////////////////////////////////////////////////////
   else if(crows==rows-1){
-   //cas de la première colonne
+   //first col
     if(ccols==0){
-     //case en haut
+     //top cell
       posmove += verifyT(board, crows, ccols, rows, cols);
 
-      //case en haut a droite
+      //right top cell
       posmove += verifyTR(board, crows, ccols, rows, cols);
 
     }
-    //cases entre la première et la dernière colonne sur la dernière ligne des colonnes paires
+    //cell between first and last col on the last row of even cols
     else if (ccols % 2 == 0 && ccols != 0 && ccols!=cols-1){
-      //case en haut a gauche
+      //top left cell 
       posmove += verifyTL(board, crows, ccols, rows, cols);
 
-      //case en haut
+      //top cell
       posmove += verifyT(board, crows, ccols, rows, cols);
 
-      //case en haut a droite
+      //top right cell
       posmove += verifyTR(board, crows, ccols, rows, cols);
 
 
     }
-      //cases entre la première et la dernière colonne sur la dernière ligne des colonnes impaires
+      //cell between the first and last col on the last row of odd cols 
     else if (ccols % 2 != 0  && ccols!=cols-1){
-      //case en haut a gauche
+      //top left cell
       posmove += verifyTL(board, crows, ccols, rows, cols);
 
-      //case en haut
+      //top cell
       posmove += verifyT(board, crows, ccols, rows, cols);
 
-      //case en haut a droite
+      //top right cell
       posmove += verifyTR(board, crows, ccols, rows, cols);
 
-      //case en bas a gauche
+      //left lower cell
       posmove += verifyLL(board, crows, ccols, rows, cols);
 
-      //case en bas a droite
+      //right lower cell
       posmove += verifyLR(board, crows, ccols, rows, cols);
 
 
       }
 
-    //cas dernière colonne
+    //last col
     else{
-      //case en haut a gauche
+      //top left cell
       posmove += verifyTL(board, crows, ccols, rows, cols);
 
-      //case en haut
+      //top cell
       posmove += verifyT(board, crows, ccols, rows, cols);
 
       
     }
 
   }
-  ///cas de la dernière première colonne//////////////////////////////////////////////////////////////////
+  ///last first cell /////////////////////////////////////////////////////////////////
   else if(ccols==0 && crows!=0 && crows!= rows-1){
-    //case en haut
+    //top cell
     posmove += verifyT(board, crows, ccols, rows, cols);
 
-    //case en haut a droite
+    //top right cell
     posmove += verifyTR(board, crows, ccols, rows, cols);
 
-    //case en bas a droite
+    //right lower cell
     posmove += verifyLR(board, crows, ccols, rows, cols);
-    //case en bas 
+    //lower cell
     posmove += verifyL(board, crows, ccols, rows, cols);
 
   }
   else if(ccols==cols-1 && crows!=0 && crows!= rows-1){
-    //case en haut
+    //upper cell
     posmove += verifyT(board, crows, ccols, rows, cols);
 
-    //case en haut a gauche
+    //left upper cell
     posmove += verifyTL(board, crows, ccols, rows, cols);
 
-    //case en bas a gauche
+    //left lower cell
     posmove += verifyLL(board, crows, ccols, rows, cols);
     //case en bas 
     posmove += verifyL(board, crows, ccols, rows, cols);
 
   }
   else{
-    //case en haut a gauche
+    //upper left cell
     posmove += verifyTL(board, crows, ccols, rows, cols);
 
-    //case en haut
+    //upper cell
     posmove += verifyT(board, crows, ccols, rows, cols);
 
-    //case en haut a droite
+    //right upper cell
     posmove += verifyTR(board, crows, ccols, rows, cols);
 
-    //case en bas a gauche
+    //lower left cell
     posmove += verifyLL(board, crows, ccols, rows, cols);
 
-    //case en bas a droite
+    //lower right cell
     posmove += verifyLR(board, crows, ccols, rows, cols);
 
-    //case en bas
+    //lower cell
     posmove += verifyL(board, crows, ccols, rows, cols);
     
   }
@@ -593,7 +592,7 @@ int possiblemove(Cell **board, int crows, int ccols, int rows, int cols) {
 void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_players, char** colors) {
     int a = (4 * rows) + 2;
 
-    // Affichage de la zone de jeu
+    // display game map
     printf("\x1B[1;1H");
   int size=cols;
    if(size%2!=0){
@@ -616,7 +615,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     printf("\x1B[5;130H Bob : ");
     printf("\x1B[5;137H\x1B[48;2;255;128;0m🐧\x1B[0m");
 
-    // Affichage des noms et scores des joueurs
+    // display names and scores of players
     printf("\x1B[%d;0H\n", a);
     printf("Joueurs :\n");
 
