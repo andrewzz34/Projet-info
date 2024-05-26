@@ -232,7 +232,7 @@ void printfishes(Cell** board,int rows, int cols){
   }
 
 }
-void affichePenguin(Cell** board, int rows, int cols, int num_players,char** colors) {
+void affichePenguin(Cell** board, int rows, int cols, int num_players,char** colors,Player* players,int* fishes) {
 
 
     srand(time(NULL)); // Initialize random number generator for different outcomes each run
@@ -273,6 +273,8 @@ void affichePenguin(Cell** board, int rows, int cols, int num_players,char** col
             board[newrows][newcols].penguin =  1;
             board[newrows][newcols].fishes = 1;
             board[newrows][newcols].playeron = i+1;
+            fishes-=1;
+            players[i].score+=1;
 
         }
     }
@@ -558,7 +560,7 @@ int possiblemove(Cell **board, int crows, int ccols, int rows, int cols) {
 
 
 
-void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_players,char** colors) {
+void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_players,char** colors,int* fishes) {
     int a = (4 * rows) + 2;
 
     // Affichage de la zone de jeu
@@ -578,7 +580,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     for (int i = 0; i < rows; i++) {
         printHexagonLine(cols);
     }
-    affichePenguin(board, rows, cols, num_players,colors);
+    affichePenguin(board, rows, cols, num_players,colors,players,fishes);
     printfishes(board,rows,cols);
     printf("\x1B[4;130H       👑");
     printf("\x1B[5;130H Bob : ");
@@ -596,13 +598,14 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
 
 
 void movepenguin(Cell** board,int rows, int cols,char** colors,Player players,int* fishes){
-    printf("\x1B[30;1H");
+
     int oldrows =0;
     int oldcols =0;
     int newrows =0;
     int newcols =0;
     int player_index;
    ///////////////////////////choix du pingouin/////////
+    printf("\x1B[30;1H"); 
     do{
 
     printf("\x1B[K");
@@ -616,7 +619,10 @@ void movepenguin(Cell** board,int rows, int cols,char** colors,Player players,in
     scanf("%d",&oldcols);
     printf("\x1B[F\x1B[K");
     printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
-    if(board[oldrows][oldcols].penguin==0){
+    
+    printf("\x1B[3;140H %d,%d",board[oldrows][oldcols].playeron , players.id_player+1);
+    printf("\x1B[34;1H"); 
+    if(board[oldrows][oldcols].penguin==0 || board[oldrows][oldcols].playeron != players.id_player+1){
         printf("\x1B[4F");
     }
     }while (board[oldrows][oldcols].penguin==0 || board[oldrows][oldcols].playeron != players.id_player+1);
@@ -754,6 +760,15 @@ int main() {
     system("clear");
 
     Cell** board = initializeBoard(rows, cols);
+    /////count number fish
+    int numberfish=0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+        numberfish += board[i][j].fishes;
+        }
+    }
+    int* pointfishes = NULL;
+    pointfishes = &numberfish;
     char* colors[MAX_PLAYERS] = {
         "\x1B[48;2;135;206;235m🐧\x1B[0m", // Blue
         "\x1B[48;2;255;165;0m🐧\x1B[0m",   // Orange
@@ -763,49 +778,96 @@ int main() {
         "\x1B[48;2;0;255;255m🐧\x1B[0m"    // Cyan
     };
     // Affichage de la zone de jeu
-    printGameBoard(board,rows, cols, players, num_players,colors);
+    printGameBoard(board,rows, cols, players, num_players,colors,pointfishes);
 
 
   /////////////////DEBUT DU JEU//////////////////////////
 
-  /////count number fish
-  int numberfish=0;
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-        numberfish += board[i][j].fishes;
-        }
-    }
-    int* pointfishes = NULL;
-    pointfishes = &numberfish;
+  
   
     ///boucle de jeu
+    /*
+    int totalmove=1;
+    while(numberfish >0 && totalmove>0){
+    int totalmove=0;
+    for (int i = 0; i < num_players; i++){
 
-    do{
-        for (int i = 0; i < num_players; i++){
-          int move =0;
           if(players[i].penguins!=0){
             for (int i = 0; i < rows; i++) {
                 for (int j = 0; j < cols; j++) {
                   if(board[i][j].playeron==i+1){
                     
-                   move += possiblemove(board, i, j,rows, cols);
+                   totalmove += possiblemove(board, i, j,rows, cols);
+                  
                   }
                 }
             }
-            if(move==0){
-              players[i].penguins=0;
-            }
-            else{
-              movepenguin(board,rows, cols,colors,players[i],pointfishes);
-            } 
-          }
-          //for (int i = 0; i < num_players; i++) {
-           //   printf("Joueur %d : %s score %d\n", i + 1, players[i].player_name,players[i].score);
-          //}
+           }
+    }
+    
+    }
+    if(totalmove==0){
+	     int max=0;
+	     for (int i = 0; i < num_players; i++){
+	      if (players[max].score<players[i].score){
+	      	max=i;
+	      }
+	     }
+		 printf("\x1B[45;1H victory of player %d ",players[max].id_player +1);
+		 exit(2);
+    }
+    else{
+        for (int i = 0; i < num_players; i++){
+    	movepenguin(board,rows, cols,colors,players[i],pointfishes);
+    	} 
+    }
+    printf("\x1B[20;1H"); 
+        for (int k = 0; k < num_players; k++) {
+        printf("Joueur %d : %s score %d\n", k + 1, players[k].player_name,players[k].score);
         }
+    }
 
-      
-    }while(numberfish!=0 && pointfishes >=0 );  
+  
+  }
+    
+*/
+	int totalmove=1;
+	  while(numberfish >0 && totalmove>0){
+	    
+	    
+	    for (int i = 0; i < num_players; i++){
+	       movepenguin(board,rows, cols,colors,players[i],pointfishes);
+	      } 
+	    
+	    int totalmove=0;
+	    for (int i = 0; i < num_players; i++){
+	      if(players[i].penguins!=0){
+		for (int i = 0; i < rows; i++) {
+		  for (int j = 0; j < cols; j++) {
+		    if(board[i][j].playeron==i+1){
+		      totalmove += possiblemove(board, i, j,rows, cols);
+		    }
+		  }
+		}
+	      }
+	    }
+	    if(totalmove==0){
+	      int max=0;
+	      for (int i = 0; i < num_players; i++){
+		if (players[max].score<players[i].score){
+		  max=i;
+		}
+	      }
+	      printf("\x1B[45;1H victory of player %d ",players[max].id_player +1);
+	      exit(2);
+	    }
+	    printf("\x1B[20;1H"); 
+	    for (int k = 0; k < num_players; k++) {
+	      printf("Joueur %d : %s score %d\n", k + 1, players[k].player_name,players[k].score);
+	    }
+	  
+	  
+	  }
     ////////////////////////FIN DU JEU/////////////////////////
   
     int a = (4 * rows) + 10;
