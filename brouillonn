@@ -23,6 +23,13 @@ typedef struct {
     int playeron;
 } Cell;
 
+void clear_input_buffer() {
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF) {
+        // Discard the character
+    }
+}
+
 char* colors[MAX_PLAYERS] = {
         "\x1B[48;2;135;206;235m🐧\x1B[0m", // Blue
         "\x1B[48;2;255;165;0m🐧\x1B[0m",   // Orange
