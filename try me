@@ -847,7 +847,7 @@ gameLoop(players, board, rows, cols, num_players);
     printGameBoard(board,rows, cols, players, num_players);
     
     for(int i=0;i<10;i++){
-    movepenguin(board, rows, cols, players);
+    movepenguin(board, rows, cols, players, colors);
     printf("\x1B[20;1H");
     }
    
