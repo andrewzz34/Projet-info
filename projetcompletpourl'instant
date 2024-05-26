@@ -35,6 +35,9 @@ void setupPlayers(Player* players, int num_players) {
         }
 
         players[i].score = 0;
+        players[i].id_player = i;
+
+      
 
         if (num_players == 2) {
             players[i].penguins = 4;
@@ -592,14 +595,15 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
 }
 
 
-void movepenguin(Cell** board,int rows, int cols,char** colors){
-    printf("\x1B[30;1H");
+void movepenguin(Cell** board,int rows, int cols,char** colors,Player players,int* fishes){
+
     int oldrows =0;
     int oldcols =0;
     int newrows =0;
     int newcols =0;
     int player_index;
-
+   ///////////////////////////choix du pingouin/////////
+    printf("\x1B[30;1H"); 
     do{
 
     printf("\x1B[K");
@@ -613,13 +617,18 @@ void movepenguin(Cell** board,int rows, int cols,char** colors){
     scanf("%d",&oldcols);
     printf("\x1B[F\x1B[K");
     printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
-    if(board[oldrows][oldcols].penguin==0){
+    
+    printf("\x1B[3;140H %d,%d",board[oldrows][oldcols].playeron , players.id_player+1);
+    printf("\x1B[34;1H"); 
+    if(board[oldrows][oldcols].penguin==0 || board[oldrows][oldcols].playeron != players.id_player+1){
         printf("\x1B[4F");
     }
-    }while (board[oldrows][oldcols].penguin==0);
-    player_index = board[oldrows][oldcols].playeron -1 ; 
+    }while (board[oldrows][oldcols].penguin==0 || board[oldrows][oldcols].playeron != players.id_player+1);
+    player_index = board[oldrows][oldcols].playeron -1 ; // verif pingouin et bon joueur
+  
     board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
     board[oldrows][oldcols].broken =1;
+  
     int playerID = board[oldrows][oldcols].playeron;
     board[oldrows][oldcols].playeron =0;
 
@@ -648,13 +657,15 @@ void movepenguin(Cell** board,int rows, int cols,char** colors){
 
       } 
       }while (newcols > cols-1 || newcols < 0);
+      
         if(board[newrows][newcols].penguin ==1 || board[newrows][newcols].broken ==1 ){
     printf("\x1B[4F");       
         }
     }while (board[newrows][newcols].penguin ==1 || (newrows==0 && newcols%2!=0) || board[newrows][newcols].broken ==1 ); // verif qu'il n'y a pas déja un pingouin
-
+    players.score += board[newrows][newcols].fishes;
     board[newrows][newcols].penguin =1;// met un pingouin sur la nouvelle case
     board[newrows][newcols].playeron = playerID;
+    fishes -= board[newrows][newcols].fishes;
 
     if(oldcols%2==0){
         int posxx= (5+(oldcols*8));
@@ -758,12 +769,49 @@ int main() {
     // Affichage de la zone de jeu
     printGameBoard(board,rows, cols, players, num_players,colors);
 
-    for(int i=0;i<10;i++){
-    movepenguin(board,rows, cols,colors);
-    printf("\x1B[20;1H");
+
+  /////////////////DEBUT DU JEU//////////////////////////
+
+  /////count number fish
+  int numberfish=0;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+        numberfish += board[i][j].fishes;
+        }
     }
+    int* pointfishes = NULL;
+    pointfishes = &numberfish;
+  
+    ///boucle de jeu
 
+    do{
+        for (int i = 0; i < num_players; i++){
+          int move =0;
+          if(players[i].penguins!=0){
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                  if(board[i][j].playeron==i+1){
+                    
+                   move += possiblemove(board, i, j,rows, cols);
+                  }
+                }
+            }
+            if(move==0){
+              players[i].penguins=0;
+            }
+            else{
+              movepenguin(board,rows, cols,colors,players[i],pointfishes);
+            } 
+          }
+          //for (int i = 0; i < num_players; i++) {
+           //   printf("Joueur %d : %s score %d\n", i + 1, players[i].player_name,players[i].score);
+          //}
+        }
 
+      
+    }while(numberfish!=0 && pointfishes >=0 );  
+    ////////////////////////FIN DU JEU/////////////////////////
+  
     int a = (4 * rows) + 10;
     printf("\x1B[%d;0H\n", a);
 
