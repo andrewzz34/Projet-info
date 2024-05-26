@@ -73,6 +73,7 @@ void setupPlayers(Player* players, int num_players, char** colors) {
         printf("Player %d: %s %s\n", i + 1, colors[i], players[i].player_name);
     }
 }
+
 void printHexagonLine(int cols) {
 
     printf("\n");
@@ -739,7 +740,12 @@ void movepenguin(Cell** board,int rows, int cols,char** colors,Player players,in
 
 
 
- int better_scan(const char *prompt) {
+
+
+
+
+
+int better_scan(const char *prompt) {
     char input[100];  // Buffer to hold input
     int value, ret_var;
 
@@ -761,9 +767,6 @@ void movepenguin(Cell** board,int rows, int cols,char** colors,Player players,in
     }
 } // fgets and sscanf will avoid a loop once the user types in a character or an invalid number.
     
-
-
-
 
 
 
@@ -793,7 +796,8 @@ int main() {
         printf("Error allocating memory for players\n");
         exit(EXIT_FAILURE);
     }
-    setupPlayers(players, num_players,);
+
+    setupPlayers(players, num_players, colors);
 
 
 
@@ -825,8 +829,7 @@ int main() {
     }
     int* pointfishes = NULL;
     pointfishes = &numberfish;
-   
-    // Affichage de la zone de jeu
+    
     printGameBoard(board,rows, cols, players, num_players,colors,pointfishes);
 
 
