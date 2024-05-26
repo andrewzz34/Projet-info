@@ -831,43 +831,40 @@ int main() {
   }
     
 */
-	int totalmove=1;
-	  while(numberfish >0 && totalmove>0){
-	    
-	    
-	    for (int i = 0; i < num_players; i++){
-	       movepenguin(board,rows, cols,colors,players[i],pointfishes);
-	      } 
-	    
-	    int totalmove=0;
-	    for (int i = 0; i < num_players; i++){
-	      if(players[i].penguins!=0){
-		for (int i = 0; i < rows; i++) {
-		  for (int j = 0; j < cols; j++) {
-		    if(board[i][j].playeron==i+1){
-		      totalmove += possiblemove(board, i, j,rows, cols);
-		    }
-		  }
-		}
-	      }
-	    }
-	    if(totalmove==0){
-	      int max=0;
-	      for (int i = 0; i < num_players; i++){
-		if (players[max].score<players[i].score){
-		  max=i;
-		}
-	      }
-	      printf("\x1B[45;1H victory of player %d ",players[max].id_player +1);
-	      exit(2);
-	    }
-	    printf("\x1B[20;1H"); 
-	    for (int k = 0; k < num_players; k++) {
-	      printf("Joueur %d : %s score %d\n", k + 1, players[k].player_name,players[k].score);
-	    }
-	  
-	  
-	  }
+	int totalmove = 1;
+while (numberfish > 0 && totalmove > 0) {
+    totalmove = 0;
+    for (int i = 0; i < num_players; i++) {
+        if (players[i].penguins != 0) {
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (board[i][j].playeron == i + 1) {
+                        totalmove += possiblemove(board, i, j, rows, cols);
+                    }
+                }
+            }
+        }
+    }
+    if (totalmove == 0) {
+        int max = 0;
+        for (int i = 0; i < num_players; i++) {
+            if (players[max].score < players[i].score) {
+                max = i;
+            }
+        }
+        printf("\x1B[45;1H victory of player %d ", players[max].id_player + 1);
+        exit(2);
+    } else {
+        for (int i = 0; i < num_players; i++) {
+            movepenguin(board, rows, cols, colors, players[i], pointfishes);
+        }
+    }
+}
+printf("\x1B[20;1H");
+for (int k = 0; k < num_players; k++) {
+    printf("Joueur %d : %s score %d\n", k + 1, players[k].player_name, players[k].score);
+}
+
     ////////////////////////FIN DU JEU/////////////////////////
   
     int a = (4 * rows) + 10;
