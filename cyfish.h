@@ -36,6 +36,8 @@ int verifyL(Cell **board, int crows, int ccols, int rows, int cols);
 int verifyLR(Cell **board, int crows, int ccols, int rows, int cols);
 int verifyLL(Cell **board, int crows, int ccols, int rows, int cols);
 int possiblemove(Cell **board, int crows, int ccols, int rows, int cols);
+void movepenguin(Cell** board,int rows, int cols,char** colors,Player players,int* fishes);
+
 
 
 
