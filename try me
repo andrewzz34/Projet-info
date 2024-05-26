@@ -667,7 +667,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
 
 
 
-void movepenguin(Cell** board,int rows, int cols){
+void movepenguin(Cell** board, int rows, int cols, Player* players, int num_players, int currentPlayer){
     printf("\x1B[30;1H");
     int oldrows =0;
     int oldcols =0;
@@ -840,6 +840,7 @@ int main() {
     int rows, cols;
     Player* players = NULL;
     int num_players;
+int currentPlayer;
     
     system("clear");
     num_players = better_scan("Enter the number of players (2 to 6): ");
@@ -883,7 +884,7 @@ gameLoop(players, board, rows, cols, num_players);
     printGameBoard(board,rows, cols, players, num_players);
     
     for(int i=0;i<10;i++){
-    movepenguin(board,rows, cols);
+    movepenguin(board, rows, cols, players, num_players, currentPlayer);
     printf("\x1B[20;1H");
     }
    
