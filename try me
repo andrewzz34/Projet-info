@@ -742,8 +742,7 @@ board[oldrows][oldcols].penguin = 0;
 
 collectFishAndScore(board, players, newrows, newcols);
 
-    displayScoreboard(players, num_players);
-// determineWinner(players, num_players);
+   
     
     if(oldcols%2==0){
         int posxx= (5+(oldcols*8));
@@ -785,6 +784,8 @@ collectFishAndScore(board, players, newrows, newcols);
         int posy = 6 + ((newrows - 1) * 4);
         printf("\x1B[%d;%dH%s", posy, posx, colors[player_index]);
     }
+ displayScoreboard(players, num_players);
+determineWinner(players, num_players);
         printboard(board,rows,cols);
 }
     
