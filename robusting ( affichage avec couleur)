@@ -23,14 +23,7 @@ typedef struct {
     int playeron;
 } Cell;
 
-char* colors[MAX_PLAYERS] = {
-        "\x1B[48;2;135;206;235m🐧\x1B[0m", // Blue
-        "\x1B[48;2;255;165;0m🐧\x1B[0m",   // Orange
-        "\x1B[48;2;124;252;0m🐧\x1B[0m",   // Green
-        "\x1B[48;2;255;0;255m🐧\x1B[0m",   // Magenta
-        "\x1B[48;2;255;255;0m🐧\x1B[0m",   // Yellow
-        "\x1B[48;2;0;255;255m🐧\x1B[0m"    // Cyan
-    };
+
 
 void setupPlayers(Player* players, int num_players) {
     for (int i = 0; i < num_players; i++) {
@@ -242,8 +235,8 @@ void printfishes(Cell** board,int rows, int cols){
 
 
 
-void affichePenguin(Cell** board, int rows, int cols, int num_players) {
-    
+void affichePenguin(Cell** board, int rows, int cols, int num_players,char** colors) {
+
 
     srand(time(NULL)); // Initialize random number generator for different outcomes each run
 
@@ -261,33 +254,37 @@ void affichePenguin(Cell** board, int rows, int cols, int num_players) {
     }
 
     int total_penguins = num_players * penguins_per_player;
-    for (int i = 0; i < total_penguins; i++) {
-        int newrows, newcols;
-        do {
-            newrows = rand() % rows;
-            newcols = rand() % cols;
-        } while (board[newrows][newcols].penguin != 0 || (newrows == 0 && newcols % 2 != 0) || board[newrows][newcols].broken == 1);
+    for (int i = 0; i < num_players; i++) {
+        for(int j=0;j<penguins_per_player;j++){
+            int newrows, newcols;
+            do {
+                newrows = rand() % rows;
+                newcols = rand() % cols;
+            } while (board[newrows][newcols].penguin != 0 || (newrows == 0 && newcols % 2 != 0) || board[newrows][newcols].broken == 1);
 
-        int posx, posy;
-        if (newcols % 2 == 0) {
-            posx = 5 + (newcols * 8);
-            posy = 4 + (newrows * 4);
-        } else {
-            posx = 13 + ((newcols - 1) * 8);
-            posy = 6 + ((newrows - 1) * 4);
+            int posx, posy;
+            if (newcols % 2 == 0) {
+                posx = 5 + (newcols * 8);
+                posy = 4 + (newrows * 4);
+            } else {
+                posx = 13 + ((newcols - 1) * 8);
+                posy = 6 + ((newrows - 1) * 4);
+            }
+
+            
+            printf("\x1B[%d;%dH%s", posy, posx, colors[i]); // Display penguin with player-specific color
+            board[newrows][newcols].penguin =  1;
+            board[newrows][newcols].fishes = 1;
+            board[newrows][newcols].playeron = i+1;
+            
         }
-
-        int player_index = i / penguins_per_player; // Determine which player this penguin belongs to
-        printf("\x1B[%d;%dH%s", posy, posx, colors[player_index]); // Display penguin with player-specific color
-        board[newrows][newcols].penguin = player_index + 1;
-        board[newrows][newcols].fishes = 1;
     }
     printboard(board, rows, cols);
 }
 
 
 
-void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_players) {
+void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_players,char** colors) {
     int a = (4 * rows) + 2;
 
     // Affichage de la zone de jeu
@@ -307,7 +304,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     for (int i = 0; i < rows; i++) {
         printHexagonLine(cols);
     }
-    affichePenguin(board, rows, cols, num_players);
+    affichePenguin(board, rows, cols, num_players,colors);
     printfishes(board,rows,cols);
     printf("\x1B[4;120H       👑");
     printf("\x1B[5;130H Bob : ");
@@ -329,7 +326,7 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
 
 
 
-void movepenguin(Cell** board,int rows, int cols){
+void movepenguin(Cell** board,int rows, int cols,char** colors){
     printf("\x1B[30;1H");
     int oldrows =0;
     int oldcols =0;
@@ -457,6 +454,8 @@ int main() {
     
     setupPlayers(players, num_players);
     
+    
+    
     // Fixation de la taille du plateau de jeu
     printf("Nombre de lignes du plateau de jeu : ");
     scanf("%d", &rows);
@@ -474,13 +473,21 @@ int main() {
         return 1;
     }
     system("clear");
-    Cell** board = initializeBoard(rows, cols);
     
+    Cell** board = initializeBoard(rows, cols);
+    char* colors[MAX_PLAYERS] = {
+        "\x1B[48;2;135;206;235m🐧\x1B[0m", // Blue
+        "\x1B[48;2;255;165;0m🐧\x1B[0m",   // Orange
+        "\x1B[48;2;124;252;0m🐧\x1B[0m",   // Green
+        "\x1B[48;2;255;0;255m🐧\x1B[0m",   // Magenta
+        "\x1B[48;2;255;255;0m🐧\x1B[0m",   // Yellow
+        "\x1B[48;2;0;255;255m🐧\x1B[0m"    // Cyan
+    };
     // Affichage de la zone de jeu
-    printGameBoard(board,rows, cols, players, num_players);
+    printGameBoard(board,rows, cols, players, num_players,colors);
     
     for(int i=0;i<10;i++){
-    movepenguin(board,rows, cols);
+    movepenguin(board,rows, cols,colors);
     printf("\x1B[20;1H");
     }
    
