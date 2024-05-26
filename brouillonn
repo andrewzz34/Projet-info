@@ -12,13 +12,15 @@
 typedef struct {
     char player_name[PLAYER_NAME_BUFFER];
     int score;
-    int penguins; 
+    int penguins;
+    int id_player; 
 } Player;
 
 typedef struct {
     int fishes; // Nombre de poissons sur la case
     int penguin; // Identifiant du pingouin sur la case, 0 si aucun
     int broken; // Indique si la case est occupée (1 pour oui, 0 pour non)
+    int playeron;
 } Cell;
 
 void setupPlayers(Player* players, int num_players) {
@@ -47,11 +49,7 @@ void setupPlayers(Player* players, int num_players) {
 void printHexagonLine(int cols) {
    
     printf("\n");
-     
-    
     cols = (cols+1)/2;
-    
-    
 
      for (int i = 0; i < cols - 1; i++) {
         printf(" /      \\");
@@ -77,6 +75,16 @@ void printHexagonLine(int cols) {
         printf("      ");
     }printf(" \\______/ ");
 }
+void printboard(Cell** board,int rows, int cols){
+     for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+         	int k=(j+(i*9))+1;
+         	printf("\x1B[%d;80H",k);	
+            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, broken=%d, Player on is %d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken, board[i][j].playeron);
+        }
+    }
+}
+
 
 Cell** initializeBoard(int rows, int cols) {
     srand(time(NULL)); // initialisation de rand()
@@ -90,43 +98,30 @@ Cell** initializeBoard(int rows, int cols) {
     // Initialiser toutes les cellules avec des poissons aléatoires entre 1 et 3
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < cols; j++) {
+            int luck= rand() % 2 + 1;	
             if(i==0 && j%2 !=0){
             board[i][j].fishes = 0;
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
+            board[i][j].playeron = 0;
             }
-            else{
+            else if(luck==1) {
             board[i][j].fishes = rand() % 3 + 1; // Entre 1 et 3 poissons
             board[i][j].penguin = 0;
             board[i][j].broken = 0;
+            board[i][j].playeron = 0;
+            }
+            else{
+            board[i][j].fishes = rand() % 2 + 2; // Entre 2 et 3 poissons
+            board[i][j].penguin = 0;
+            board[i][j].broken = 0;
+            board[i][j].playeron = 0;
             }
         }
     }
+  
 
-    // Déterminer le nombre maximum de cases sans poissons possibles
-    int maxZeroFishCells = (rows * cols) - 1; // Total cells minus one already set
-    int zeroFishCells = maxZeroFishCells < 2 ? maxZeroFishCells : 2; // Maximum two, but not exceeding the number of available cells
-
-    board[0][1].fishes = 0; // Set one cell to have zero fish initially
-    zeroFishCells--;
-    while (zeroFishCells > 0) {
-        int i = rand() % rows;
-        int j = rand() % cols;
-        if (board[i][j].fishes != 0) { // Check if the cell already has zero fish
-            board[i][j].fishes = 0;
-            zeroFishCells--;
-           // Debug print
-        }
-    }
-
-    //printf("\x1B[1;1H");
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-         	int k=(j+(i*9))+1;
-         	printf("\x1B[%d;80H",k);	
-            printf("Cell[%d][%d]: 🐟=%d, 🐧=%d, occupied=%d\n", i, j, board[i][j].fishes, board[i][j].penguin, board[i][j].broken);
-        }
-    }
+    printboard(board,rows,cols);// a titre vérificatif
 
     // Retourner le pointeur vers le tableau
     return board;
@@ -208,31 +203,345 @@ void printfishes(Cell** board,int rows, int cols){
           }
           
         }
-      else if(j%2==1){
-        int y=(4*i)+1;
-        int x=9+(8*(j-1));
-        printf("\x1B[%d;%dH",y,x);
-        if (board[i][j].fishes == 0){
-          printf("/        \\");
+	      else if(j%2==1){
+		int y=(4*i)+1;
+		int x=9+(8*(j-1));
+		printf("\x1B[%d;%dH",y,x);
+		if (board[i][j].fishes == 0){
+		  printf("/        \\");
 
-        }
-        else if(board[i][j].fishes == 1){
-          printf("/   🐟   \\");
+		}
+		else if(board[i][j].fishes == 1){
+		  printf("/   🐟   \\");
 
-        }
-        else if(board[i][j].fishes == 2){
-          printf("/  🐟🐟  \\");
+		}
+		else if(board[i][j].fishes == 2){
+		  printf("/  🐟🐟  \\");
 
-        }
-        else if(board[i][j].fishes == 3){
-          printf("/ 🐟🐟🐟 \\");
+		}
+		else if(board[i][j].fishes == 3){
+		  printf("/ 🐟🐟🐟 \\");
 
-        }
-      }
+        	}		
+             }		
       }
     }
   }
 
+}
+void affichePenguin(Cell** board, int rows, int cols) {
+    srand(time(NULL)); // Initialize random number generator for different outcomes each run
+	for(int i=0;i<12;i++){
+      	    int newrows =rand() % rows-1 + 1;;
+	    int newcols =rand() % cols-1 + 1;;
+	   
+	   if (newrows ==0){
+	   	if(newcols%2==0){
+		int posx= 5+(newcols*8);
+		int posy= 4+(newrows*4);
+		printf("\x1B[%d;%dH🐧",posy,posx);
+		board[newrows][newcols].penguin = 1;
+		board[newrows][newcols].fishes = 1;
+		
+	    }
+	   }
+	   
+	   else{
+	   if(newcols%2==0){
+		int posx= 5+(newcols*8);
+		int posy= 4+(newrows*4);
+		printf("\x1B[%d;%dH🐧",posy,posx);
+		board[newrows][newcols].penguin = 1;
+		board[newrows][newcols].fishes = 1;
+	    }
+	    
+	    else{
+	    	//newcols = newcols-1;
+		int posx= 13+((newcols-1)*8);
+		int posy= 6+((newrows-1)*4);
+		printf("\x1B[%d;%dH🐧",posy,posx);
+		board[newrows][newcols].penguin = 1;
+		board[newrows][newcols].fishes = 1;
+    		}
+	   }
+	    
+    }
+    printboard(board,rows,cols);
+    
+}
+
+
+//case en haut ///////////////////////////////////////////////////////////////////
+int verifyT(Cell **board, int crows, int ccols, int rows, int cols){
+  //case en haut 
+  if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
+      return 1;
+  } 
+  else {
+      return 0;
+  }
+
+}
+
+//case en bas///////////////////////////////////////////////////////////////////
+int verifyL(Cell **board, int crows, int ccols, int rows, int cols){
+  //case en bas
+  if ((board[crows + 1][ccols].penguin ==0 && board[crows + 1][ccols].broken == 0)) {
+      return 1;
+  } 
+  else {
+      return 0;
+  }
+}
+//case en haut a droite///////////////////////////////////////////////////////////////////
+
+int verifyTR(Cell **board, int crows, int ccols, int rows, int cols){
+  //case en haut a droite colonnes paire
+  if(ccols%2==0){
+       if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
+         return 1;
+       } 
+       else {
+         return 0;
+       }
+     }
+
+  else{
+    //case en haut a droite colonnes impaire
+
+     if ((board[crows-1][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
+       return 1;
+     } 
+     else {
+       return 0;
+     }
+  }
+}
+
+
+//case en bas a droite///////////////////////////////////////////////////////////////////
+
+int verifyLR(Cell **board, int crows, int ccols, int rows, int cols){
+  //case en bas à droite colonnes paire
+  if(ccols%2==0){
+
+    if ((board[crows+1][ccols + 1].penguin ==0 && board[crows+1][ccols + 1].broken == 0)) {
+        return 1;
+    } else {
+        return 0;
+    }
+  }
+    //case en bas à droite colonnes impaire
+
+  else{
+    if ((board[crows][ccols + 1].penguin ==0 && board[crows][ccols + 1].broken == 0)) {
+      return 1;
+    } 
+    else {
+      return 0;
+    }
+  }
+ 
+}
+
+//case en bas a gauche///////////////////////////////////////////////////////////////////
+
+int verifyLL(Cell **board, int crows, int ccols, int rows, int cols){
+    if(ccols%2==0){
+
+      if ((board[crows+1][ccols - 1].penguin ==0 && board[crows+1][ccols - 1].broken == 0)) {
+          return 1;
+      } 
+      else {
+          return 0;
+      }
+    }
+      //case en bas à gauche colonnes impaire
+
+    else{
+      if ((board[crows][ccols - 1].penguin ==0 && board[crows][ccols - 1].broken == 0)) {
+        return 1;
+      } 
+      else {
+        return 0;
+      }
+    }
+
+}
+
+
+int verifyTL(Cell **board, int crows, int ccols, int rows, int cols){
+  if(ccols%2==0){
+
+    if ((board[crows][ccols - 1].penguin ==0 && board[crows][ccols - 1].broken == 0)) {
+      return 1;
+    } 
+    else {
+      return 0;
+    }
+  }
+        //case en bas à droite colonnes impaire
+
+  else{
+        if ((board[crows- 1][ccols - 1].penguin ==0 && board[crows- 1][ccols - 1].broken == 0)) {
+          return 1;
+        } 
+        else {
+          return 0;
+        }
+      }
+ }
+
+
+
+
+int possiblemove(Cell **board, int crows, int ccols, int rows, int cols) {
+  ///// Cette fonction sert à compter le nombre de directions possibles d'un joueurs, je me suis rendu
+  //compte apres 180 lignes qu'il aurait été plus judicieux de faires 6 autres fonctions du style verif en 
+  //haut a gauche, en haut a droite, en bas a gauche voila...
+
+  int posmove = 0;
+  // cas de la première ligne/////////////////////////////////////////////////////////
+  if (crows == 0) { 
+    // cas de la première colonne de la première ligne
+    if (ccols == 0) {
+      //case en bas à droite
+      posmove += verifyLR(board, crows, ccols, rows, cols);
+      // case en dessous
+      posmove += verifyL(board, crows, ccols, rows, cols);
+
+    }
+
+    //cases entre la première et la dernière colonne
+    else if (ccols % 2 == 0 && ccols != 0 && ccols!=cols-1) {
+      //case en bas a droite
+      posmove += verifyLR(board, crows, ccols, rows, cols);
+
+      //case en dessous
+      posmove += verifyL(board, crows, ccols, rows, cols);
+
+      //case en bas a gauche
+      posmove += verifyLL(board, crows, ccols, rows, cols);
+
+    } 
+    // cas première ligne dernière colonne
+
+    else {
+      //case en dessous
+      posmove += verifyL(board, crows, ccols, rows, cols);
+
+      //case en bas a gauche
+      posmove += verifyLL(board, crows, ccols, rows, cols);
+
+    }
+  }
+
+    
+
+  ///cas de la dernière ligne//////////////////////////////////////////////////////////////////////////
+  else if(crows==rows-1){
+   //cas de la première colonne
+    if(ccols==0){
+     //case en haut
+      posmove += verifyT(board, crows, ccols, rows, cols);
+
+      //case en haut a droite
+      posmove += verifyTR(board, crows, ccols, rows, cols);
+
+    }
+    //cases entre la première et la dernière colonne sur la dernière ligne des colonnes paires
+    else if (ccols % 2 == 0 && ccols != 0 && ccols!=cols-1){
+      //case en haut a gauche
+      posmove += verifyTL(board, crows, ccols, rows, cols);
+
+      //case en haut
+      posmove += verifyT(board, crows, ccols, rows, cols);
+
+      //case en haut a droite
+      posmove += verifyTR(board, crows, ccols, rows, cols);
+
+
+    }
+      //cases entre la première et la dernière colonne sur la dernière ligne des colonnes impaires
+    else if (ccols % 2 != 0  && ccols!=cols-1){
+      //case en haut a gauche
+      posmove += verifyTL(board, crows, ccols, rows, cols);
+
+      //case en haut
+      posmove += verifyT(board, crows, ccols, rows, cols);
+
+      //case en haut a droite
+      posmove += verifyTR(board, crows, ccols, rows, cols);
+
+      //case en bas a gauche
+      posmove += verifyLL(board, crows, ccols, rows, cols);
+
+      //case en bas a droite
+      posmove += verifyLR(board, crows, ccols, rows, cols);
+
+
+      }
+
+    //cas dernière colonne
+    else{
+      //case en haut a gauche
+      posmove += verifyTL(board, crows, ccols, rows, cols);
+
+      //case en haut
+      posmove += verifyT(board, crows, ccols, rows, cols);
+
+      
+    }
+
+  }
+  ///cas de la dernière première colonne//////////////////////////////////////////////////////////////////
+  else if(ccols==0 && crows!=0 && crows!= rows-1){
+    //case en haut
+    posmove += verifyT(board, crows, ccols, rows, cols);
+
+    //case en haut a droite
+    posmove += verifyTR(board, crows, ccols, rows, cols);
+
+    //case en bas a droite
+    posmove += verifyLR(board, crows, ccols, rows, cols);
+    //case en bas 
+    posmove += verifyL(board, crows, ccols, rows, cols);
+
+  }
+  else if(ccols==cols-1 && crows!=0 && crows!= rows-1){
+    //case en haut
+    posmove += verifyT(board, crows, ccols, rows, cols);
+
+    //case en haut a gauche
+    posmove += verifyTL(board, crows, ccols, rows, cols);
+
+    //case en bas a gauche
+    posmove += verifyLL(board, crows, ccols, rows, cols);
+    //case en bas 
+    posmove += verifyL(board, crows, ccols, rows, cols);
+
+  }
+  else{
+    //case en haut a gauche
+    posmove += verifyTL(board, crows, ccols, rows, cols);
+
+    //case en haut
+    posmove += verifyT(board, crows, ccols, rows, cols);
+
+    //case en haut a droite
+    posmove += verifyTR(board, crows, ccols, rows, cols);
+
+    //case en bas a gauche
+    posmove += verifyLL(board, crows, ccols, rows, cols);
+
+    //case en bas a droite
+    posmove += verifyLR(board, crows, ccols, rows, cols);
+
+    //case en bas
+    posmove += verifyL(board, crows, ccols, rows, cols);
+    
+  }
+  return posmove;
 }
 
 
@@ -258,8 +567,13 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     for (int i = 0; i < rows; i++) {
         printHexagonLine(cols);
     }
+    affichePenguin(board, rows, cols);
     printfishes(board,rows,cols);
-    printf("\x1B[3;5H\x1B[48;2;255;128;0m🐧\x1B[0m");
+    int mv=possiblemove(board, 3, 3, rows, cols);
+    printf("\x1B[10;135H%d",mv);
+    printf("\x1B[4;130H       👑");
+    printf("\x1B[5;130H Bob : ");
+    printf("\x1B[5;137H\x1B[48;2;255;128;0m🐧\x1B[0m");
 
     // Affichage des noms et scores des joueurs
     printf("\x1B[%d;0H\n", a);
@@ -271,43 +585,166 @@ void printGameBoard(Cell** board,int rows, int cols, Player* players, int num_pl
     printf("\n");
 }
 
-void movepenguin(){
+
+
+
+int isPathClear(Cell** board, int startRow, int startCol, int endRow, int endCol, int rows, int cols) {
+    // Check that starting and ending points are within the board
+    if (startRow < 0 || startRow >= rows || endRow < 0 || endRow >= rows ||
+        startCol < 0 || startCol >= cols || endCol < 0 || endCol >= cols) {
+        return 0; // Out of bounds, path not clear
+    }
+
+    // Calculate steps needed to move from start to end
+    int rowStep = (endRow > startRow) ? 1 : ((endRow < startRow) ? -1 : 0);
+    int colStep = (endCol > startCol) ? 1 : ((endCol < startCol) ? -1 : 0);
+    
+    // Move step by step from start to end (not including the start cell)
+    int currentRow = startRow + rowStep;
+    int currentCol = startCol + colStep;
+
+    while (currentRow != endRow || currentCol != endCol) {
+        // Check for broken cells in the path
+        if (board[currentRow][currentCol].broken) {
+            return 0; // Path is blocked by a broken cell
+        }
+        currentRow += rowStep;
+        currentCol += colStep;
+    }
+
+    // Check the destination cell for being broken or occupied
+    if (board[endRow][endCol].broken || board[endRow][endCol].penguin != 0) {
+        return 0; // Destination is blocked
+    }
+
+    return 1; // Path is clear and the move is valid
+}
+
+
+
+void movepenguin(Cell** board,int rows, int cols){
+    printf("\x1B[30;1H");
+    int oldrows =0;
+    int oldcols =0;
     int newrows =0;
     int newcols =0;
-    printf("sur quelle ligne voulez vous deplacer votre penguin ?\n");
-    scanf("%d",&newrows);
-    printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
-    scanf("%d",&newcols);
-    if(newcols%2==0){
-        int posx= 5+(newcols*8);
-        int posy= 4+(newrows*4);
-        printf("\x1B[%d;%dH🐧",posy,posx);
-        
+    
+    do{
+     
+    printf("\x1B[K");
+    printf("sur quelle ligne se situe le penguin que voulez vous deplacer ?\n");
+    scanf("%d",&oldrows);
+    printf("\x1B[F\x1B[K");
+    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
+
+    printf("\x1B[K");
+    printf("sur quelle colonne situe le penguin que voulez vous deplacer ?\n");
+    scanf("%d",&oldcols);
+    printf("\x1B[F\x1B[K");
+    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
+    if(board[oldrows][oldcols].penguin==0){
+        printf("\x1B[4F");
     }
-}
-
-
-void affichePenguin(Cell** board, int rows, int cols) {
-    srand(time(NULL)); // Initialize random number generator for different outcomes each run
-
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < cols; j++) {
-            if (j % 2 == 0) {  // Process only even columns
-                if (board[i][j].penguin == 0 && !board[i][j].broken) { // Ensure the cell is empty and not broken
-                    // Calculate positions for display using the even column formula
-                    int posx = 5 + (j * 8);
-                    int posy = 4 + (i * 4);
-                    if (rand() % 2) { // Randomly decide to place a penguin or not
-                        printf("\x1B[%d;%dH🐧", posy, posx);
-                        board[i][j].penguin = 1; // Update the board to reflect a penguin is now here
-                    }
-                }
-            }
+    }while (board[oldrows][oldcols].penguin==0);
+    board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
+    board[oldrows][oldcols].broken =1;
+    
+    
+    do{
+	    do{
+	    printf("\x1B[K");
+	    printf("sur quelle ligne voulez vous deplacer votre penguin ?\n"); 
+	    scanf("%d",&newrows);
+	    printf("\x1B[F\x1B[K");
+	    printf("\x1B[E"); 
+	    if (newrows > rows-1 || newrows < 0) {
+		printf("\x1B[2F");
+	       	   
+	    }   
+	    }while (newrows > rows-1 || newrows < 0);
+	    
+	    do{
+	    printf("\x1B[K");
+	    printf("sur quelle colonne voulez vous deplacer votre penguin ?\n");
+	    scanf("%d",&newcols);
+	    printf("\x1B[F\x1B[K");
+	    printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
+	    if (newcols > cols-1 || newcols < 0 ) {
+		printf("\x1B[2F");
+	       	   
+	    } 
+	    }while (newcols > cols-1 || newcols < 0);
+        if(board[newrows][newcols].penguin ==1 || board[newrows][newcols].broken ==1 ){
+		printf("\x1B[4F");       
         }
+    }while (board[newrows][newcols].penguin ==1 || (newrows==0 && newcols%2!=0) || board[newrows][newcols].broken ==1 ); // verif qu'il n'y a pas déja un pingouin
+    
+    board[newrows][newcols].penguin =1;// met un pingouin sur la nouvelle case
+    
+    if(oldcols%2==0){
+        int posxx= (5+(oldcols*8));
+        int posyy= (4+(oldrows*4));  
+	printf("\x1B[%d;%dH",posyy-2,posxx-2);
+	printf("🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy-1,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy+1,posxx-2);
+	printf("🌊🌊🌊");
+
     }
 
-    printf("\x1B[0;0H"); // Reset cursor position after printing
+    else{
+            oldcols = oldcols-1;
+        int posxx= (13+(oldcols*8));
+        int posyy= (6+((oldrows-1)*4));
+        printf("\x1B[%d;%dH",posyy-2,posxx-2);
+	printf("🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy-1,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy,posxx-3);
+	printf("🌊🌊🌊🌊");
+	printf("\x1B[%d;%dH",posyy+1,posxx-2);
+	printf("🌊🌊🌊");
+	
+	
+    }
+    
+    if(newcols%2==0){
+        int posx= (5+(newcols*8));
+        int posy= (4+(newrows*4));
+        printf("\x1B[%d;%dH🐧",posy,posx);
+
+    }
+
+    else{
+        newcols = newcols-1;
+        int posx= 13+(newcols*8);
+        int posy= 6+((newrows-1)*4);
+        printf("\x1B[%d;%dH🐧",posy,posx);
+
+    }
+
+if (isPathClear(board, oldrows, oldcols, newrows, newcols, rows, cols) == 1) {
+        board[newrows][newcols].penguin = board[oldrows][oldcols].penguin; // Move the penguin to the new cell
+        board[oldrows][oldcols].penguin = 0; // Clear the old cell
+        board[oldrows][oldcols].broken = 1; // Mark the old position as broken
+        printf("Move successful!\n");
+    } else {
+        printf("Cannot move across broken cells.\n");
+        board[oldrows][oldcols].penguin = 1; // Put the penguin back in the original position if move is not possible
+    }
+
+
+        printboard(board,rows,cols);
 }
+    
+
+
+    
+    
+
 
 
 int main() {
@@ -337,11 +774,7 @@ int main() {
     if (cols%2==0){
     cols +=1;
     }
-    
-  
-    
-    
-    
+   
 
     // Vérification de la validité de la taille du plateau de jeu
     if (rows < 1 || cols < 1 || rows > MAX_ROWS || cols > MAX_COLS) {
@@ -349,19 +782,20 @@ int main() {
         free(players);
         return 1;
     }
-    
+    system("clear");
     Cell** board = initializeBoard(rows, cols);
     
     // Affichage de la zone de jeu
     printGameBoard(board,rows, cols, players, num_players);
-    for(int i=0;i<10;i++){
-
-    affichePenguin(board, rows, cols);
-    movepenguin();
+    
+    
+    
+    for(int i=0;i<2;i++){
+    movepenguin(board,rows, cols);
     printf("\x1B[20;1H");
     }
    
-
+    
     int a = (4 * rows) + 10;
     printf("\x1B[%d;0H\n", a);
     
@@ -370,4 +804,6 @@ int main() {
     
     
     return 0;
+    
+    
 }
