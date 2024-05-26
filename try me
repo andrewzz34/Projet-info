@@ -82,6 +82,34 @@ void setupPlayers(Player* players, int num_players) {
     }
 }
 
+void collectFishAndScore(Cell **board, Player *players, int row, int col) {
+    int playerId = board[row][col].penguin - 1; // Adjust index since player ID starts from 1 in your setup
+    if (playerId >= 0 && board[row][col].fishes > 0) {
+        players[playerId].score += board[row][col].fishes; // Add fish count to player's score
+        board[row][col].fishes = 0; // Remove fishes from the cell after collecting
+    }
+}
+
+void displayScoreboard(Player *players, int num_players) {
+    printf("\x1B[2;100H Scoreboard:\n"); // Move cursor to a specific location suitable for your layout
+    for (int i = 0; i < num_players; i++) {
+        printf("\x1B[%d;100H %s: %d points\n", 3 + i, players[i].player_name, players[i].score);
+    }
+}
+
+void determineWinner(Player *players, int num_players) {
+    int maxScore = 0;
+    int winnerIndex = 0;
+    for (int i = 0; i < num_players; i++) {
+        if (players[i].score > maxScore) {
+            maxScore = players[i].score;
+            winnerIndex = i;
+        }
+    }
+    printf("\x1B[10;100H Congratulations, %s wins with %d points!\n", players[winnerIndex].player_name, maxScore);
+}
+
+
 void printHexagonLine(int cols) {
    
     printf("\n");
@@ -660,10 +688,15 @@ void movepenguin(Cell** board,int rows, int cols){
     scanf("%d",&oldcols);
     printf("\x1B[F\x1B[K");
     printf("\x1B[E"); // Déplace le curseur vers la ligne suivante
-    if(board[oldrows][oldcols].penguin==0){
-        printf("\x1B[4F");
-    }
-    }while (board[oldrows][oldcols].penguin==0);
+
+
+
+ if (board[oldrows][oldcols].penguin - 1 != currentPlayer) {
+printf("\x1B[4F");
+            printf("You can only move your own penguins. Please select again.\n");
+        }
+    } while (board[oldrows][oldcols].penguin - 1 != currentPlayer);
+
  player_index = board[oldrows][oldcols].penguin - 1; 
     board[oldrows][oldcols].penguin =0;// met la case sans pingouin et la casse
     board[oldrows][oldcols].broken =1;
@@ -697,8 +730,20 @@ void movepenguin(Cell** board,int rows, int cols){
 		printf("\x1B[4F");       
         }
     }while (board[newrows][newcols].penguin ==1 || (newrows==0 && newcols%2!=0) || board[newrows][newcols].broken ==1 ); // verif qu'il n'y a pas déja un pingouin
-    
+
+board[oldrows][oldcols].penguin = 0;
+    board[oldrows][oldcols].broken = 1;
+
+    // New position setup (should validate new position inside moving logic)
+    board[newrows][newcols].penguin = currentPlayer + 1;
+
+
     board[newrows][newcols].penguin =1;// met un pingouin sur la nouvelle case
+
+collectFishAndScore(board, players, newrows, newcols);
+
+    displayScoreboard(players, num_players);
+// determineWinner(players, num_players);
     
     if(oldcols%2==0){
         int posxx= (5+(oldcols*8));
@@ -746,6 +791,24 @@ void movepenguin(Cell** board,int rows, int cols){
 
 
 
+void gameLoop(Player* players, Cell** board, int rows, int cols, int num_players) {
+    int currentPlayer = 0;
+    int gameContinue = 1;
+
+    while (gameContinue) {
+        printGameBoard(board, rows, cols, players, num_players);
+        movepenguin(board, rows, cols, players, num_players, currentPlayer);
+
+        currentPlayer = (currentPlayer + 1) % num_players; // Move to the next player
+
+        // Condition to determine if the game should continue
+        // gameContinue = checkIfGameContinues(...);
+
+        if (!gameContinue) {
+            determineWinner(players, num_players);
+        }
+    }
+}
 
 
   int better_scan(const char *prompt) {
@@ -813,6 +876,8 @@ int main() {
     }
     system("clear");
     Cell** board = initializeBoard(rows, cols);
+gameLoop(players, board, rows, cols, num_players);
+
     
     // Affichage de la zone de jeu
     printGameBoard(board,rows, cols, players, num_players);
